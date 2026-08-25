@@ -4,8 +4,11 @@ using UnityEngine;
 /// Attach this script to the Main Camera.
 /// Click on any 3D object (with a Collider) to pick it up.
 /// While holding, the object follows a point in front of the camera.
+/// Scroll the mouse wheel while holding to zoom the object closer/further.
 /// Hold R + move the mouse to rotate/inspect the object.
-/// Click again (or press E) to release.
+/// Click again (or press E) to release — the object will smoothly drift
+/// back to the exact position/rotation it was picked up from before
+/// physics takes back over.
 /// </summary>
 public class Pickup : MonoBehaviour
 {
@@ -19,9 +22,27 @@ public class Pickup : MonoBehaviour
     [Tooltip("How smoothly the object follows the hold point.")]
     [SerializeField] private float followSpeed = 12f;
 
+    [Header("Height (Scroll) Settings")]
+    [Tooltip("How much each scroll tick raises/lowers the held object.")]
+    [SerializeField] private float heightSensitivity = 1.5f;
+
+    [Tooltip("Lowest the object can be scrolled to, relative to its pickup height.")]
+    [SerializeField] private float minHeightOffset = -3f;
+
+    [Tooltip("Highest the object can be scrolled to, relative to its pickup height.")]
+    [SerializeField] private float maxHeightOffset = 3f;
+
     [Header("Inspection / Rotation")]
     [Tooltip("Mouse sensitivity when rotating the held object.")]
     [SerializeField] private float rotationSensitivity = 5f;
+
+    [Header("Return To Origin Settings")]
+    [Tooltip("How quickly the object drifts back to its original spot after release.")]
+    [SerializeField] private float returnSpeed = 4f;
+
+    [Tooltip("How close (position) and aligned (rotation, degrees) the object must get before physics resumes.")]
+    [SerializeField] private float returnPositionThreshold = 0.05f;
+    [SerializeField] private float returnRotationThreshold = 1f;
 
     [Header("Layer Mask (optional)")]
     [Tooltip("Which layers can be picked up. Leave to 'Everything' for all.")]
@@ -31,7 +52,13 @@ public class Pickup : MonoBehaviour
     private GameObject heldObject;
     private Rigidbody heldRb;
     private bool isInspecting;
+    private bool isReturning;
     private float lockedY;
+    private float baseHoldY;
+
+    // Original transform, restored to on release
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
 
     // Stored physics state so we can restore on release
     private bool originalUseGravity;
@@ -45,27 +72,51 @@ public class Pickup : MonoBehaviour
         {
             if (heldObject == null)
                 TryPickup();
-            else
-                Release();
+            else if (!isReturning)
+                BeginReturn();
         }
 
         // Alternate release with E
-        if (heldObject != null && Input.GetKeyDown(KeyCode.E))
+        if (heldObject != null && !isReturning && Input.GetKeyDown(KeyCode.E))
         {
-            Release();
+            BeginReturn();
+        }
+
+        // --- Height (scroll) while actively holding (not while returning) ---
+        if (heldObject != null && !isReturning)
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (Mathf.Abs(scroll) > Mathf.Epsilon)
+            {
+                lockedY += scroll * heightSensitivity;
+                lockedY = Mathf.Clamp(
+                    lockedY,
+                    baseHoldY + minHeightOffset,
+                    baseHoldY + maxHeightOffset
+                );
+            }
         }
 
         // --- Inspect rotation ---
-        if (heldObject != null)
+        if (heldObject != null && !isReturning)
         {
             if (Input.GetKey(KeyCode.R))
             {
-                isInspecting = true;
+                if (!isInspecting)
+                {
+                    isInspecting = true;
+                    // Lock the cursor so its screen position stays put while we
+                    // rotate via mouse delta — prevents a jump when R is released.
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
                 RotateHeldObject();
             }
-            else
+            else if (isInspecting)
             {
                 isInspecting = false;
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
             }
         }
     }
@@ -73,6 +124,12 @@ public class Pickup : MonoBehaviour
     void FixedUpdate()
     {
         if (heldObject == null) return;
+
+        if (isReturning)
+        {
+            MoveTowardsOrigin();
+            return;
+        }
 
         if (isInspecting)
         {
@@ -96,10 +153,17 @@ public class Pickup : MonoBehaviour
         {
             GameObject target = hit.collider.gameObject;
             lockedY = target.transform.position.y;
+            baseHoldY = lockedY;
 
             // Pick up the root of the collider's Rigidbody if it has one,
             // otherwise just use the collider's gameObject.
             Rigidbody rb = target.GetComponentInParent<Rigidbody>();
+
+            GameObject pickedObject = (rb != null) ? rb.gameObject : target;
+
+            // Remember where it started so we can send it back later
+            originalPosition = pickedObject.transform.position;
+            originalRotation = pickedObject.transform.rotation;
 
             if (rb != null)
             {
@@ -123,16 +187,92 @@ public class Pickup : MonoBehaviour
                 heldObject = target;
                 heldRb = null;
             }
+
+            isReturning = false;
+            isInspecting = false;
         }
     }
 
     // ─────────────────────────────────────────────
-    //  RELEASE
+    //  BEGIN RETURN (instead of releasing instantly)
     // ─────────────────────────────────────────────
-    private void Release()
+    private void BeginReturn()
     {
+        isInspecting = false;
+        isReturning = true;
+
+        // Make sure the cursor is freed in case we were mid-rotation
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         if (heldRb != null)
         {
+            // Keep gravity off and let us drive velocity manually until it arrives home
+            heldRb.useGravity = false;
+            heldRb.angularVelocity = Vector3.zero;
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  MOVE TOWARDS ORIGIN, THEN FINALIZE RELEASE
+    // ─────────────────────────────────────────────
+    private void MoveTowardsOrigin()
+    {
+        Vector3 currentPos = heldObject.transform.position;
+        Quaternion currentRot = heldObject.transform.rotation;
+
+        float posDistance = Vector3.Distance(currentPos, originalPosition);
+        float rotAngle = Quaternion.Angle(currentRot, originalRotation);
+
+        bool arrived = posDistance <= returnPositionThreshold && rotAngle <= returnRotationThreshold;
+
+        if (arrived)
+        {
+            // Snap exactly into place, then hand control back to physics
+            heldObject.transform.position = originalPosition;
+            heldObject.transform.rotation = originalRotation;
+            FinalizeRelease();
+            return;
+        }
+
+        if (heldRb != null)
+        {
+            Vector3 direction = originalPosition - currentPos;
+            heldRb.linearVelocity = direction * returnSpeed;
+            heldObject.transform.rotation = Quaternion.Slerp(
+                currentRot,
+                originalRotation,
+                Time.fixedDeltaTime * returnSpeed
+            );
+        }
+        else
+        {
+            heldObject.transform.position = Vector3.Lerp(
+                currentPos,
+                originalPosition,
+                Time.fixedDeltaTime * returnSpeed
+            );
+            heldObject.transform.rotation = Quaternion.Slerp(
+                currentRot,
+                originalRotation,
+                Time.fixedDeltaTime * returnSpeed
+            );
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  FINALIZE RELEASE (restore physics state)
+    // ─────────────────────────────────────────────
+    private void FinalizeRelease()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (heldRb != null)
+        {
+            heldRb.linearVelocity = Vector3.zero;
+            heldRb.angularVelocity = Vector3.zero;
+
             // Restore original physics state
             heldRb.useGravity = originalUseGravity;
             heldRb.collisionDetectionMode = originalCollisionMode;
@@ -142,6 +282,7 @@ public class Pickup : MonoBehaviour
         heldObject = null;
         heldRb = null;
         isInspecting = false;
+        isReturning = false;
     }
 
     // ─────────────────────────────────────────────
@@ -152,7 +293,7 @@ public class Pickup : MonoBehaviour
         // Project the mouse cursor into world space at holdDistance from the camera
         Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         Vector3 holdPoint = mouseRay.origin + mouseRay.direction * holdDistance;
-        
+
         // Lock the Y axis
         holdPoint.y = lockedY;
 
