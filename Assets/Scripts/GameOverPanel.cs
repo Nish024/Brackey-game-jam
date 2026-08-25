@@ -14,30 +14,38 @@ public class GameOverPanel : MonoBehaviour
 
         if (restartButton != null)
         {
-            restartButton.onClick.AddListener(() =>
-            {
-                if (GameManager.Instance != null)
-                    GameManager.Instance.StartNewGame();
-            });
+            restartButton.onClick.AddListener(OnRestartClicked);
         }
     }
 
-    void OnEnable()
+    public void OnRestartClicked()
     {
-        GameEvents.OnGameOver += ShowGameOver;
+        Debug.Log("[GameOverPanel] Restart button clicked.");
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartNewGame();
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
     }
 
-    void OnDisable()
+    public void ShowGameOver(GameOverReason reason)
     {
-        GameEvents.OnGameOver -= ShowGameOver;
-    }
+        // Ensure the root object is active if it was disabled in the inspector
+        gameObject.SetActive(true);
 
-    private void ShowGameOver(GameOverReason reason)
-    {
-        if (panelRoot != null) panelRoot.SetActive(true);
+        if (panelRoot != null)
+        {
+            panelRoot.SetActive(true);
+            panelRoot.transform.SetAsLastSibling(); // Force render on top of BlackScreen
+        }
 
         if (reasonText != null)
         {
+            reasonText.gameObject.SetActive(true); // Ensure it's active in case it was off in Inspector
+            reasonText.enabled = true; // Ensure the component is ticked on
             switch (reason)
             {
                 case GameOverReason.Arrest:

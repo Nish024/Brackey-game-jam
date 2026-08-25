@@ -595,9 +595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bef56136ba851e47a4fd53bcb6f1728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  mainMenuScene: MainMenu
-  shopScene: Main
-  resultsScene: Results
+  gameOverPanel: {fileID: 1115911997}
   startingCash: 1000
   baseProfitTarget: 50
   profitTargetIncrease: 20
@@ -819,7 +817,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: stolen
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -885,7 +883,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 5.589102, z: 0, w: -5.599308}
+  m_margin: {x: -17.1623, y: 5.589102, z: -17.88041, w: -5.599308}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1042,7 +1040,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &453797665
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1789,7 +1787,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 769157708}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1115911997}
+        m_TargetAssemblyTypeName: GameOverPanel, Assembly-CSharp
+        m_MethodName: OnRestartClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &769157708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2380,7 +2390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1115911996
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4257,7 +4267,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2006121993
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4385,7 +4395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuctionButtonController
   auctionButtonObject: {fileID: 2006121992}
-  thresholdFraction: 0.05
+  thresholdFraction: 10
 --- !u!1 &2036757531
 GameObject:
   m_ObjectHideFlags: 0

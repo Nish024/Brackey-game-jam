@@ -11,15 +11,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     // ── Inspector Config ───────────────────────────
-    [Header("Scene Names")]
-    [Tooltip("Name of the main menu scene.")]
-    [SerializeField] private string mainMenuScene = "MainMenu";
-
-    [Tooltip("Name of the shop / trading scene.")]
-    [SerializeField] private string shopScene = "Main";
-
-    [Tooltip("Name of the results / game-over scene.")]
-    [SerializeField] private string resultsScene = "Results";
+    [Header("UI References")]
+    [Tooltip("Drag the GameOver game object here.")]
+    [SerializeField] private GameOverPanel gameOverPanel;
 
     [Header("Starting Values")]
     [Tooltip("Cash the player starts with on Day 1.")]
@@ -72,13 +66,11 @@ public class GameManager : MonoBehaviour
     void OnEnable()
     {
         GameEvents.OnGameOver += HandleGameOver;
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void OnDisable()
     {
         GameEvents.OnGameOver -= HandleGameOver;
-        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     // ─────────────────────────────────────────────────
@@ -96,7 +88,8 @@ public class GameManager : MonoBehaviour
         loanUseCount = 0;
         isPaused = false;
 
-        LoadShopScene();
+        GameEvents.ClearAll();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     /// <summary>Advance to the next day after a successful day. Does NOT reload the scene.</summary>
@@ -113,30 +106,9 @@ public class GameManager : MonoBehaviour
         // DayManager handles the in-scene transition — no scene reload needed
     }
 
-    /// <summary>Load the main menu scene.</summary>
-    public void GoToMainMenu()
-    {
-        // Clear stale event listeners from shop scene
-        GameEvents.ClearAll();
-        SceneManager.LoadScene(mainMenuScene);
-    }
-
     // ─────────────────────────────────────────────────
     //  PRIVATE
     // ─────────────────────────────────────────────────
-
-    private void LoadShopScene()
-    {
-        // Clear stale event listeners before loading fresh shop scene
-        GameEvents.ClearAll();
-        SceneManager.LoadScene(shopScene);
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Re-subscribe our own listener after ClearAll wiped it
-        GameEvents.OnGameOver += HandleGameOver;
-    }
 
     private void HandleGameOver(GameOverReason reason)
     {
@@ -145,5 +117,10 @@ public class GameManager : MonoBehaviour
         isPaused = true;
 
         Debug.Log($"[GameManager] GAME OVER — Reason: {reason} | Day: {currentDay} | Peak Net Worth: ${peakNetWorth:F0}");
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.ShowGameOver(reason);
+        }
     }
 }

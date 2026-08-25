@@ -30,31 +30,11 @@ public class AuctionResultsPanel : MonoBehaviour
 
     void Awake()
     {
-        // Add override canvas to the panel root so it always renders on top
-        if (panelRoot != null)
-        {
-            Canvas overrideCanvas = panelRoot.GetComponent<Canvas>();
-            if (overrideCanvas == null) overrideCanvas = panelRoot.AddComponent<Canvas>();
-            overrideCanvas.overrideSorting = true;
-            overrideCanvas.sortingOrder = 100;
+        if (panelRoot != null) panelRoot.SetActive(false);
 
-            if (panelRoot.GetComponent<GraphicRaycaster>() == null)
-                panelRoot.AddComponent<GraphicRaycaster>();
-
-            panelRoot.SetActive(false);
-        }
-
-        // Add override canvas to the Next Day button if it's outside
+        // Also hide the Next Day button if it's outside the panel
         if (nextDayButton != null)
         {
-            Canvas btnCanvas = nextDayButton.GetComponent<Canvas>();
-            if (btnCanvas == null) btnCanvas = nextDayButton.gameObject.AddComponent<Canvas>();
-            btnCanvas.overrideSorting = true;
-            btnCanvas.sortingOrder = 101;
-
-            if (nextDayButton.GetComponent<GraphicRaycaster>() == null)
-                nextDayButton.gameObject.AddComponent<GraphicRaycaster>();
-
             nextDayButton.gameObject.SetActive(false);
             nextDayButton.onClick.AddListener(OnNextDayClicked);
         }
@@ -92,16 +72,18 @@ public class AuctionResultsPanel : MonoBehaviour
         if (totalEarningsText != null)
             totalEarningsText.text = $"Total Earned: ${totalEarnings:F0}";
 
-        // Activate the panel
+        // Activate the panel and move it to the bottom of the hierarchy so it renders on top
         if (panelRoot != null)
         {
             panelRoot.SetActive(true);
+            panelRoot.transform.SetAsLastSibling();
         }
 
-        // Show the Next Day button (even if it's outside the panel)
+        // Show the Next Day button and move it to the bottom of the hierarchy so it renders on top
         if (nextDayButton != null)
         {
             nextDayButton.gameObject.SetActive(true);
+            nextDayButton.transform.SetAsLastSibling();
         }
 
         Debug.Log($"[AuctionResultsPanel] Panel activated. Items: {items?.Count ?? 0}");
