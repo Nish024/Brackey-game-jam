@@ -22,10 +22,14 @@ public class TransactionController : MonoBehaviour
     private bool decisionPending;
     private bool shopClosed;
 
-    // Temporary randomized states for testing auction logic
+    // Randomized states
     private bool currentIsFake;
-    private bool currentIsDamaged;
+    private ItemRarity actualRarity;
+    private ItemRarity claimedRarity;
     private bool currentIsStolen;
+
+    private float honestBasePrice;
+    private float askingPrice;
 
     /// <summary>Whether a customer is waiting for a Buy/Reject decision.</summary>
     public bool DecisionPending => decisionPending;
@@ -47,9 +51,18 @@ public class TransactionController : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by the spawner or item system to set the price of the current item.
+    /// Called by the spawner or item system to set the base price of the current item.
+    /// In the future, this should probably be calculated inside TransactionController, but for now we'll just set it.
+    /// Actually, let's let OnCustomerArrived generate the prices for testing.
     /// </summary>
     public void SetCurrentItemPrice(float price) => currentItemPrice = price;
+
+    public void ApplyConfrontationDiscount()
+    {
+        askingPrice = honestBasePrice;
+        currentItemPrice = askingPrice;
+        // In the future, fire an event to update the UI specifically if needed.
+    }
 
     public void SetCurrentItemName(string name) => currentItemName = name;
 
@@ -71,7 +84,7 @@ public class TransactionController : MonoBehaviour
                 itemName         = currentItemName,
                 purchasePrice    = currentItemPrice,
                 isFake           = currentIsFake,
-                isDamaged        = currentIsDamaged,
+                rarity           = actualRarity,
                 isStolen         = currentIsStolen,
                 loanAmount       = loan != null ? loan.amount : 0f,
                 loanInterestRate = loan != null ? loan.rate   : 0f
@@ -104,23 +117,52 @@ public class TransactionController : MonoBehaviour
     {
         decisionPending = true;
 
-        // --- TEMPORARY RANDOMIZED STATE FOR TESTING ---
+        // --- RANDOMIZED STATE FOR TESTING ---
         currentIsFake = false;
-        currentIsDamaged = false;
         currentIsStolen = false;
+        actualRarity = ItemRarity.Good;
+        claimedRarity = ItemRarity.Good;
 
         float r = Random.value;
-        if (r < 0.2f)      currentIsStolen = true;  // 20% stolen
-        else if (r < 0.4f) currentIsFake = true;    // 20% fake
-        else if (r < 0.6f) currentIsDamaged = true; // 20% damaged
-        // else 40% genuine
+        if (r < 0.2f)
+        {
+            currentIsStolen = true;
+            actualRarity = Random.value > 0.5f ? ItemRarity.Good : ItemRarity.Rare;
+            claimedRarity = actualRarity; // Stolen items usually claim their real rarity
+        }
+        else if (r < 0.4f)
+        {
+            currentIsFake = true;
+            actualRarity = ItemRarity.Good; // It's fake, so actual rarity doesn't matter much
+            claimedRarity = Random.value > 0.5f ? ItemRarity.Good : ItemRarity.Rare; // Bluffing
+        }
+        else if (r < 0.7f)
+        {
+            actualRarity = ItemRarity.Good;
+            claimedRarity = ItemRarity.Good; // Genuine Good
+        }
+        else
+        {
+            actualRarity = ItemRarity.Rare;
+            claimedRarity = ItemRarity.Rare; // Genuine Rare
+        }
+
+        // Calculate Prices
+        float baseItemValue = Random.Range(100f, 500f);
+        
+        // Honest Price
+        honestBasePrice = currentIsFake ? 0f : (actualRarity == ItemRarity.Rare ? baseItemValue * 3f : baseItemValue);
+        
+        // Asking Price (based on claim)
+        float claimedValue = claimedRarity == ItemRarity.Rare ? baseItemValue * 3f : baseItemValue;
+        askingPrice = claimedValue * Random.Range(0.8f, 1.2f); // Slight haggling variance
+        
+        currentItemPrice = askingPrice; // The price they initially ask for
 
         if (itemStateText != null)
         {
-            if (currentIsStolen)  itemStateText.text = "State: STOLEN";
-            else if (currentIsFake)    itemStateText.text = "State: Fake";
-            else if (currentIsDamaged) itemStateText.text = "State: Damaged";
-            else                       itemStateText.text = "State: Genuine";
+            string actualStr = currentIsFake ? "FAKE" : currentIsStolen ? $"STOLEN ({actualRarity})" : actualRarity.ToString();
+            itemStateText.text = $"Actual: {actualStr}\nClaim: {claimedRarity}";
         }
         // ----------------------------------------------
     }

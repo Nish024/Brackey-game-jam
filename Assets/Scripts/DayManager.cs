@@ -140,6 +140,8 @@ public class DayManager : MonoBehaviour
         // Re-enable blocksRaycasts so the black screen covers everything (like buttons behind it)
         screenFader.SetBlocksRaycasts(true);
 
+        float profitEarnedToday = endOfDayCash - netWorthAtDayStart;
+
         // Check for Game Over conditions
         if (endOfDayCash < 0)
         {
@@ -147,8 +149,9 @@ public class DayManager : MonoBehaviour
             return;
         }
 
-        if (GameManager.Instance != null && endOfDayCash < GameManager.Instance.todaysProfitTarget)
+        if (GameManager.Instance != null && profitEarnedToday < GameManager.Instance.todaysProfitTarget)
         {
+            Debug.Log($"[DayManager] Missed profit quota! Earned: ${profitEarnedToday:F0}, Target: ${GameManager.Instance.todaysProfitTarget:F0}");
             GameEvents.OnGameOver?.Invoke(GameOverReason.MissedQuota);
             return;
         }

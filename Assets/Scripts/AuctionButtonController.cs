@@ -9,16 +9,26 @@ using UnityEngine.UI;
 public class AuctionButtonController : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("The Auction button UI object to show/hide.")]
+    [Tooltip("The Auction button UI object to show/hide (Canvas UI).")]
     [SerializeField] private GameObject auctionButtonObject;
+
+    [Tooltip("If using a 3D button, assign its MeshRenderer here to toggle emission.")]
+    [SerializeField] private MeshRenderer buttonMeshRenderer;
+    
+    [Tooltip("If using a 3D button, assign the Button3D script here to toggle interactability.")]
+    [SerializeField] private Button3D button3DScript;
 
     [Header("Settings")]
     [Tooltip("Cash threshold percentage or fraction (e.g., 0.1 for 10%, or 50 for 50%).")]
     [SerializeField] private float thresholdFraction = 0.10f;
 
+    [Tooltip("The emission color when the 3D button is active (HDR).")]
+    [SerializeField] [ColorUsage(true, true)] private Color activeEmissionColor = new Color(1f, 0.9f, 0f) * 3f;
+
     private float startingCashThisDay;
     private bool buttonShown;
     private CanvasGroup canvasGroup;
+    private Material buttonMaterialInstance;
 
     void Awake()
     {
@@ -26,11 +36,19 @@ public class AuctionButtonController : MonoBehaviour
             auctionButtonObject = gameObject;
 
         // If the script is attached to the button object itself, use CanvasGroup so the script doesn't disable itself!
-        if (auctionButtonObject == gameObject)
+        if (auctionButtonObject == gameObject && GetComponent<RectTransform>() != null)
         {
             canvasGroup = GetComponent<CanvasGroup>();
             if (canvasGroup == null)
                 canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+
+        if (buttonMeshRenderer != null)
+        {
+            // Create a material instance so we don't permanently modify the project asset
+            buttonMaterialInstance = buttonMeshRenderer.material;
+            // Ensure emission is enabled on the material keyword just in case
+            buttonMaterialInstance.EnableKeyword("_EMISSION");
         }
     }
 
@@ -102,15 +120,28 @@ public class AuctionButtonController : MonoBehaviour
 
     private void SetButtonVisible(bool visible)
     {
+        // 1. Canvas UI support
         if (canvasGroup != null)
         {
             canvasGroup.alpha = visible ? 1f : 0f;
             canvasGroup.interactable = visible;
             canvasGroup.blocksRaycasts = visible;
         }
-        else if (auctionButtonObject != null)
+        else if (auctionButtonObject != null && buttonMeshRenderer == null)
         {
             auctionButtonObject.SetActive(visible);
+        }
+
+        // 2. 3D Button support
+        if (button3DScript != null)
+        {
+            button3DScript.interactable = visible;
+        }
+
+        if (buttonMaterialInstance != null)
+        {
+            Color targetEmission = visible ? activeEmissionColor : Color.black; // Color.black is 0 intensity
+            buttonMaterialInstance.SetColor("_EmissionColor", targetEmission);
         }
     }
 }

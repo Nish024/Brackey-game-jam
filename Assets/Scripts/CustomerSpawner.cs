@@ -62,7 +62,9 @@ public class CustomerSpawner : MonoBehaviour
     // Next clicked → spawn a new customer (the previous one is already leaving/gone)
     private void OnNextRequested()
     {
-        if (!timerExpired)
+        // Foolproof check: only spawn if the timer hasn't expired AND there is no customer currently at the counter.
+        // (When a customer leaves, currentCustomer is set to null immediately, allowing the next spawn).
+        if (!timerExpired && currentCustomer == null)
             SpawnCustomer();
     }
 

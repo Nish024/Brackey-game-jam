@@ -19,6 +19,23 @@ public class Pickup : MonoBehaviour
     private ItemController inspectedItem;
     private bool isRotating;
 
+    [Header("Zoom")]
+    [SerializeField] private float zoomSensitivity = 30f;
+    [SerializeField] private float minFOV = 20f;
+    private float defaultFOV;
+    private float targetFOV;
+    private Camera mainCam;
+
+    void Awake()
+    {
+        mainCam = Camera.main;
+        if (mainCam != null)
+        {
+            defaultFOV = mainCam.fieldOfView;
+            targetFOV = defaultFOV;
+        }
+    }
+
     void OnEnable()
     {
         GameEvents.OnDecisionMade += OnDecisionMade;
@@ -40,6 +57,7 @@ public class Pickup : MonoBehaviour
         }
 
         HandleRotation();
+        HandleZoom();
     }
 
     // ─────────────────────────────────────────────────
@@ -114,6 +132,34 @@ public class Pickup : MonoBehaviour
     }
 
     // ─────────────────────────────────────────────────
+    //  ZOOM
+    // ─────────────────────────────────────────────────
+
+    private void HandleZoom()
+    {
+        if (mainCam == null) return;
+
+        if (inspectedItem != null)
+        {
+            // Allow zooming only when item is picked up
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (Mathf.Abs(scroll) > 0.01f)
+            {
+                targetFOV -= scroll * zoomSensitivity;
+                targetFOV = Mathf.Clamp(targetFOV, minFOV, defaultFOV);
+            }
+        }
+        else
+        {
+            // If no item is picked up, ensure target is default
+            targetFOV = defaultFOV;
+        }
+
+        // Smoothly interpolate the camera's FOV to the target
+        mainCam.fieldOfView = Mathf.Lerp(mainCam.fieldOfView, targetFOV, Time.deltaTime * 15f);
+    }
+
+    // ─────────────────────────────────────────────────
     //  FORCE RELEASE (decision was made externally)
     // ─────────────────────────────────────────────────
 
@@ -126,6 +172,7 @@ public class Pickup : MonoBehaviour
             Cursor.visible = true;
         }
         inspectedItem = null;
+        targetFOV = defaultFOV; // Reset zoom
     }
 
     private void OnDecisionMade(bool wasBought)

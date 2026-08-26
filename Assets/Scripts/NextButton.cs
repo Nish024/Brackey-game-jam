@@ -9,17 +9,18 @@ using UnityEngine.UI;
 /// </summary>
 public class NextButton : MonoBehaviour
 {
-    [SerializeField] private Button button;
+    [SerializeField] private Button uiButton;
+    [SerializeField] private Button3D button3D;
 
     private bool timerHasExpired;
 
     void Awake()
     {
-        if (button == null)
-            button = GetComponent<Button>();
+        if (uiButton == null) uiButton = GetComponent<Button>();
+        if (button3D == null) button3D = GetComponent<Button3D>();
 
         // Start disabled — no decision has been made yet
-        button.interactable = false;
+        SetInteractable(false);
     }
 
     void OnEnable()
@@ -40,7 +41,7 @@ public class NextButton : MonoBehaviour
 
     public void OnNextClicked()
     {
-        button.interactable = false;
+        SetInteractable(false);
 
         if (timerHasExpired)
         {
@@ -64,7 +65,7 @@ public class NextButton : MonoBehaviour
     private void OnDecisionMade(bool wasBought)
     {
         // Player made a decision — enable the Next button
-        button.interactable = true;
+        SetInteractable(true);
     }
 
     private void OnTimerExpired()
@@ -77,13 +78,18 @@ public class NextButton : MonoBehaviour
     private void OnNewCustomer()
     {
         // A new customer just arrived — disable until decision is made
-        button.interactable = false;
+        SetInteractable(false);
     }
 
     private void OnShopOpened()
     {
         timerHasExpired = false;
-        button.interactable = false;
+        SetInteractable(false);
     }
 
+    private void SetInteractable(bool state)
+    {
+        if (uiButton != null) uiButton.interactable = state;
+        if (button3D != null) button3D.interactable = state;
+    }
 }
