@@ -46,18 +46,21 @@ public class ScreenFader : MonoBehaviour
     /// </summary>
     public void ShowDayIntro(int dayNumber, System.Action onComplete)
     {
+        gameObject.SetActive(true);
         StartCoroutine(DayIntroCo(dayNumber, onComplete));
     }
 
     /// <summary>Fades screen from transparent to black. Calls onComplete when done.</summary>
     public void FadeToBlack(System.Action onComplete = null)
     {
+        gameObject.SetActive(true);
         StartCoroutine(FadeCo(0f, 1f, fadeDuration, onComplete));
     }
 
     /// <summary>Fades screen from black to transparent. Calls onComplete when done.</summary>
     public void FadeFromBlack(System.Action onComplete = null)
     {
+        gameObject.SetActive(true);
         StartCoroutine(FadeCo(1f, 0f, fadeDuration, onComplete));
     }
 

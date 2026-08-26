@@ -127,6 +127,12 @@ public class DayManager : MonoBehaviour
 
         float endOfDayCash = ledger.NetWorth;
 
+        // Hide the auction panel FIRST so it doesn't overlap with Game Over screens
+        auctionResultsPanel.Hide();
+
+        // Re-enable blocksRaycasts so the black screen covers everything (like buttons behind it)
+        screenFader.SetBlocksRaycasts(true);
+
         // Check for Game Over conditions
         if (endOfDayCash < 0)
         {
@@ -139,12 +145,6 @@ public class DayManager : MonoBehaviour
             GameEvents.OnGameOver?.Invoke(GameOverReason.MissedQuota);
             return;
         }
-
-        // Screen is already black — just hide the auction panel
-        auctionResultsPanel.Hide();
-
-        // Re-enable blocksRaycasts so the black screen covers everything during intro
-        screenFader.SetBlocksRaycasts(true);
 
         // Advance the day in GameManager
         if (GameManager.Instance != null)

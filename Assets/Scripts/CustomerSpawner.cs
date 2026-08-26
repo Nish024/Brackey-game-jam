@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Manages the customer lifecycle:
@@ -27,6 +28,7 @@ public class CustomerSpawner : MonoBehaviour
 
     private GameObject currentCustomer;
     private bool timerExpired;
+    private List<GameObject> activeCustomers = new List<GameObject>(); // Tracks ALL customers, even leaving ones
 
     void OnEnable()
     {
@@ -71,13 +73,16 @@ public class CustomerSpawner : MonoBehaviour
 
     private void OnShopClosed()
     {
-        // Destroy any leftover customer immediately
-        if (currentCustomer != null)
+        // Destroy ALL leftover customers immediately (including those walking out)
+        StopAllCoroutines(); // stop any active lerps
+
+        foreach (var customer in activeCustomers)
         {
-            StopAllCoroutines(); // stop any active lerps
-            Destroy(currentCustomer);
-            currentCustomer = null;
+            if (customer != null) Destroy(customer);
         }
+        activeCustomers.Clear();
+        currentCustomer = null;
+
         timerExpired = false; // reset for next day
     }
 
@@ -89,6 +94,8 @@ public class CustomerSpawner : MonoBehaviour
     {
         if (customerPrefab == null) { Debug.LogError("[CustomerSpawner] No prefab!"); return; }
         currentCustomer = Instantiate(customerPrefab, startingSP.position, startingSP.rotation);
+        activeCustomers.Add(currentCustomer);
+        
         StartCoroutine(MoveToCounter(currentCustomer));
     }
 
@@ -112,7 +119,12 @@ public class CustomerSpawner : MonoBehaviour
         currentCustomer = null;
 
         yield return StartCoroutine(LerpToPoint(leaving, leavingSP.position, leavingSP.rotation));
-        if (leaving != null) Destroy(leaving);
+        
+        if (leaving != null)
+        {
+            activeCustomers.Remove(leaving);
+            Destroy(leaving);
+        }
 
         GameEvents.OnCustomerLeft?.Invoke();
     }

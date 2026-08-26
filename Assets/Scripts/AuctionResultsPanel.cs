@@ -46,6 +46,8 @@ public class AuctionResultsPanel : MonoBehaviour
 
     public void Show(List<PurchasedItem> items, float totalEarnings)
     {
+        gameObject.SetActive(true); // Ensure the panel's GameObject is active first!
+
         // Clear any previous rows
         foreach (Transform child in rowContainer)
             Destroy(child.gameObject);

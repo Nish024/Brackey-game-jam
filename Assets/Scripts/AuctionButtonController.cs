@@ -51,6 +51,7 @@ public class AuctionButtonController : MonoBehaviour
     /// <summary>Called by DayManager right before the shop opens each day.</summary>
     public void InitialiseForDay(float startCash)
     {
+        gameObject.SetActive(true); // Ensure GameObject is active so Awake and OnEnable run!
         startingCashThisDay = startCash;
         buttonShown = false;
         SetButtonVisible(false);
