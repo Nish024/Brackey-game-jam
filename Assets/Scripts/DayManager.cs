@@ -106,12 +106,19 @@ public class DayManager : MonoBehaviour
         }
 
         float totalEarned = 0f;
-        foreach (var item in results) totalEarned += item.salePrice;
+        bool loanWasRepaid = false;
+        foreach (var item in results)
+        {
+            totalEarned += item.salePrice;
+            // loanAmount is zeroed out by AuctionResolver when repaid
+            if (item.loanAmount == 0f && item.loanInterestRate > 0f)
+                loanWasRepaid = true;
+        }
 
-        Debug.Log($"[DayManager] Showing auction panel with {results.Count} items. Total: ${totalEarned:F0}");
+        Debug.Log($"[DayManager] Showing auction panel with {results.Count} items. Total: ${totalEarned:F0} | Loan repaid: {loanWasRepaid}");
 
         // Show auction panel ON TOP of the black screen
-        auctionResultsPanel.Show(results, totalEarned);
+        auctionResultsPanel.Show(results, totalEarned, loanWasRepaid);
 
         // Disable blocksRaycasts so clicks pass through the black screen to the Auction panel
         screenFader.SetBlocksRaycasts(false);

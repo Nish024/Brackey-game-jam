@@ -7,15 +7,25 @@ using UnityEngine;
 /// </summary>
 public class RoundTimer : MonoBehaviour
 {
-    [Header("Timer Settings")]
-    [Tooltip("Duration of the round in seconds. 360 = 6 minutes.")]
+    [Header("Clock Settings")]
+    [Tooltip("Start hour of the day (e.g. 9 for 9:00 AM).")]
+    [SerializeField] private int startHour = 9;
+    [Tooltip("Start minute of the day.")]
+    [SerializeField] private int startMinute = 0;
+    
+    [Tooltip("End hour of the day (e.g. 17 for 5:00 PM).")]
+    [SerializeField] private int endHour = 17;
+    [Tooltip("End minute of the day.")]
+    [SerializeField] private int endMinute = 0;
+
+    [Tooltip("Duration of the round in real-time seconds (e.g. 360 = 6 minutes).")]
     [SerializeField] private float roundDuration = 360f;
 
     private float timeRemaining;
     private bool isRunning;
     private bool hasExpired;
 
-    /// <summary>Current time left in seconds.</summary>
+    /// <summary>Current real-time seconds left in the day.</summary>
     public float TimeRemaining => timeRemaining;
 
     /// <summary>Whether the timer is actively counting down.</summary>
@@ -26,8 +36,6 @@ public class RoundTimer : MonoBehaviour
 
     void OnEnable()  => GameEvents.OnShopOpened += StartTimer;
     void OnDisable() => GameEvents.OnShopOpened -= StartTimer;
-
-    // StartTimer is now called by OnShopOpened — NOT in Start()
 
     void Update()
     {
@@ -41,7 +49,7 @@ public class RoundTimer : MonoBehaviour
             return;
         }
 
-        GameEvents.OnTimerTick?.Invoke(timeRemaining);
+        GameEvents.OnTimerTick?.Invoke(GetFormattedTime());
     }
 
     private void TimerComplete()
@@ -49,7 +57,8 @@ public class RoundTimer : MonoBehaviour
         hasExpired = true;
         isRunning = false;
         timeRemaining = 0f;
-        GameEvents.OnTimerTick?.Invoke(0f);
+        
+        GameEvents.OnTimerTick?.Invoke(GetFormattedTime());
         GameEvents.OnTimerExpired?.Invoke();
 
         // Force end the day immediately!
@@ -64,7 +73,7 @@ public class RoundTimer : MonoBehaviour
         isRunning = true;
         hasExpired = false;
 
-        GameEvents.OnTimerTick?.Invoke(timeRemaining);
+        GameEvents.OnTimerTick?.Invoke(GetFormattedTime());
     }
 
     /// <summary>Pause the timer without resetting it.</summary>
@@ -86,5 +95,29 @@ public class RoundTimer : MonoBehaviour
         isRunning  = false;
         hasExpired = false;
         timeRemaining = roundDuration;
+    }
+
+    /// <summary>Maps progress to a 12-hour clock format (e.g. 9:00, 9:05, 5:00) in 5-minute steps.</summary>
+    public string GetFormattedTime()
+    {
+        float elapsed = roundDuration - timeRemaining;
+        float progress = Mathf.Clamp01(elapsed / roundDuration);
+
+        int startTotalMinutes = startHour * 60 + startMinute;
+        int endTotalMinutes = endHour * 60 + endMinute;
+
+        float currentTotalMinutes = startTotalMinutes + (endTotalMinutes - startTotalMinutes) * progress;
+
+        // Round to nearest 5 minutes
+        int roundedMinutes = Mathf.RoundToInt(currentTotalMinutes / 5f) * 5;
+
+        int hour = (roundedMinutes / 60) % 24;
+        int minute = roundedMinutes % 60;
+
+        // Format to 12-hour format (e.g. 17 -> 5)
+        int displayHour = hour % 12;
+        if (displayHour == 0) displayHour = 12;
+
+        return $"{displayHour}:{minute:00}";
     }
 }

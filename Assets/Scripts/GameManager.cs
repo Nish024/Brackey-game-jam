@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+        transform.SetParent(null); // Detach from parent to allow DontDestroyOnLoad without warnings
         DontDestroyOnLoad(gameObject);
 
         // If we are starting directly in the Shop scene (for testing), initialize cash

@@ -38,8 +38,10 @@ public class AuctionResolver : MonoBehaviour
             }
         }
 
-        // ── Price each item ──────────────────────────
+        // ── Price each item and deduct loans ─────────
         float totalEarnings = 0f;
+        bool loanNotRepaid = false;
+
         foreach (var item in items)
         {
             if (item.isFake)
@@ -48,6 +50,25 @@ public class AuctionResolver : MonoBehaviour
                 item.salePrice = Mathf.Round(item.purchasePrice * damagedMultiplier);
             else
                 item.salePrice = Mathf.Round(item.purchasePrice * genuineMultiplier);
+
+            // Deduct loan repayment from this item's sale price
+            float repayment = item.LoanRepaymentDue;
+            if (repayment > 0f)
+            {
+                Debug.Log($"[AuctionResolver] Loan repayment due on '{item.itemName}': ${repayment:F0}");
+                if (item.salePrice >= repayment)
+                {
+                    item.salePrice -= repayment;
+                    item.loanAmount = 0f; // mark as repaid for UI
+                    Debug.Log($"[AuctionResolver] Loan repaid for '{item.itemName}'. Net sale: ${item.salePrice:F0}");
+                }
+                else
+                {
+                    // Can't repay from sale proceeds
+                    loanNotRepaid = true;
+                    Debug.Log($"[AuctionResolver] LOAN NOT REPAID for '{item.itemName}'! Sale ${item.salePrice:F0} < repayment ${repayment:F0}");
+                }
+            }
 
             totalEarnings += item.salePrice;
             Debug.Log($"[AuctionResolver] '{item.itemName}' ({item.StatusText}) — bought ${item.purchasePrice:F0}, sold ${item.salePrice:F0}");
@@ -58,6 +79,14 @@ public class AuctionResolver : MonoBehaviour
             ledger.Add(totalEarnings);
 
         Debug.Log($"[AuctionResolver] Total auction earnings: ${totalEarnings:F0}");
+
+        // ── Check unpaid loan after earnings are in ──
+        if (loanNotRepaid)
+        {
+            GameEvents.OnGameOver?.Invoke(GameOverReason.LoanNotRepaid);
+            return null; // Stop further processing
+        }
+
         return items;
     }
 }

@@ -19,10 +19,8 @@ public class TimerDisplay : MonoBehaviour
         GameEvents.OnTimerTick -= UpdateDisplay;
     }
 
-    private void UpdateDisplay(float timeRemaining)
+    private void UpdateDisplay(string clockTime)
     {
-        int minutes = Mathf.FloorToInt(timeRemaining / 60f);
-        int seconds = Mathf.FloorToInt(timeRemaining % 60f);
-        timerText.text = $"{minutes:00}:{seconds:00}";
+        timerText.text = clockTime;
     }
 }

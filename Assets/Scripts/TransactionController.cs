@@ -10,6 +10,7 @@ public class TransactionController : MonoBehaviour
 {
     [SerializeField] private Ledger ledger;
     [SerializeField] private PurchasedInventory purchasedInventory;
+    [SerializeField] private LoanManager loanManager;
 
     [Header("Testing Only - Item State Display")]
     [SerializeField] private TMPro.TextMeshProUGUI itemStateText;
@@ -31,16 +32,18 @@ public class TransactionController : MonoBehaviour
 
     void OnEnable()
     {
-        GameEvents.OnCustomerReady += OnCustomerArrived;
-        GameEvents.OnShopClosed    += OnShopClosed;
-        GameEvents.OnShopOpened    += OnShopOpened;
+        GameEvents.OnCustomerReady  += OnCustomerArrived;
+        GameEvents.OnShopClosed     += OnShopClosed;
+        GameEvents.OnShopOpened     += OnShopOpened;
+        GameEvents.OnLoanConfirmed  += OnLoanConfirmed;
     }
 
     void OnDisable()
     {
-        GameEvents.OnCustomerReady -= OnCustomerArrived;
-        GameEvents.OnShopClosed    -= OnShopClosed;
-        GameEvents.OnShopOpened    -= OnShopOpened;
+        GameEvents.OnCustomerReady  -= OnCustomerArrived;
+        GameEvents.OnShopClosed     -= OnShopClosed;
+        GameEvents.OnShopOpened     -= OnShopOpened;
+        GameEvents.OnLoanConfirmed  -= OnLoanConfirmed;
     }
 
     /// <summary>
@@ -59,24 +62,30 @@ public class TransactionController : MonoBehaviour
 
         if (ledger.Spend(currentItemPrice))
         {
-            // File this item into today's purchased inventory
+            // Attach any pending loan data to this item
+            LoanData loan = LoanManager.PendingLoanData;
+            LoanManager.ClearPendingLoan();
+
             var item = new PurchasedItem
             {
-                itemName      = currentItemName,
-                purchasePrice = currentItemPrice,
-                isFake        = currentIsFake,
-                isDamaged     = currentIsDamaged,
-                isStolen      = currentIsStolen
+                itemName         = currentItemName,
+                purchasePrice    = currentItemPrice,
+                isFake           = currentIsFake,
+                isDamaged        = currentIsDamaged,
+                isStolen         = currentIsStolen,
+                loanAmount       = loan != null ? loan.amount : 0f,
+                loanInterestRate = loan != null ? loan.rate   : 0f
             };
             purchasedInventory?.AddItem(item);
 
             decisionPending = false;
-            if (itemStateText != null) itemStateText.text = ""; // clear text
+            if (itemStateText != null) itemStateText.text = "";
             GameEvents.OnDecisionMade?.Invoke(true);
         }
         else
         {
-            Debug.Log($"[Transaction] Can't afford ${currentItemPrice:F0}!");
+            // Can't afford — do nothing. The Loan Button handles this case.
+            Debug.Log($"[Transaction] Can't afford ${currentItemPrice:F0}.");
         }
     }
 
@@ -126,5 +135,12 @@ public class TransactionController : MonoBehaviour
     private void OnShopOpened()
     {
         shopClosed = false;
+    }
+
+    /// <summary>Called when LoanManager confirms a loan — retry the buy with the new funds.</summary>
+    private void OnLoanConfirmed()
+    {
+        Debug.Log("[Transaction] Loan confirmed — retrying Buy.");
+        Buy();
     }
 }

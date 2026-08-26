@@ -57,6 +57,9 @@ public class GameOverPanel : MonoBehaviour
                 case GameOverReason.MissedQuota:
                     reasonText.text = "You didn't hit the target profit for the day!";
                     break;
+                case GameOverReason.LoanNotRepaid:
+                    reasonText.text = "You couldn't repay your loan! The bank has seized your shop.";
+                    break;
             }
         }
     }

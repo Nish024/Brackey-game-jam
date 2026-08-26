@@ -20,6 +20,7 @@ public class AuctionResultsPanel : MonoBehaviour
     [Header("Summary")]
     [SerializeField] private TextMeshProUGUI totalEarningsText;
     [SerializeField] private TextMeshProUGUI emptyMessageText; // shown when 0 items bought
+    [SerializeField] private TextMeshProUGUI loanRepaidText;   // shown when a loan was repaid this day
 
     [Header("Buttons")]
     [SerializeField] private Button nextDayButton;
@@ -44,7 +45,7 @@ public class AuctionResultsPanel : MonoBehaviour
     //  PUBLIC API  (called by DayManager)
     // ─────────────────────────────────────────────────
 
-    public void Show(List<PurchasedItem> items, float totalEarnings)
+    public void Show(List<PurchasedItem> items, float totalEarnings, bool loanWasRepaid = false)
     {
         gameObject.SetActive(true); // Ensure the panel's GameObject is active first!
 
@@ -73,6 +74,13 @@ public class AuctionResultsPanel : MonoBehaviour
 
         if (totalEarningsText != null)
             totalEarningsText.text = $"Total Earned: ${totalEarnings:F0}";
+
+        // Show/hide the Loan Repaid banner
+        if (loanRepaidText != null)
+        {
+            loanRepaidText.gameObject.SetActive(loanWasRepaid);
+            loanRepaidText.enabled = true;
+        }
 
         // Activate the panel and move it to the bottom of the hierarchy so it renders on top
         if (panelRoot != null)

@@ -7,8 +7,8 @@ using System;
 public static class GameEvents
 {
     // ── Timer ──────────────────────────────────────
-    /// <summary>Fired every frame by RoundTimer with the current time remaining.</summary>
-    public static Action<float> OnTimerTick;
+    /// <summary>Fired every frame by RoundTimer with the current clock time string.</summary>
+    public static Action<string> OnTimerTick;
 
     /// <summary>Fired once when the timer reaches zero.</summary>
     public static Action OnTimerExpired;
@@ -33,6 +33,14 @@ public static class GameEvents
     // ── Money ──────────────────────────────────────
     /// <summary>Fired whenever net worth changes, with the new value.</summary>
     public static Action<float> OnNetWorthChanged;
+
+    // ── Loan ───────────────────────────────────────
+    /// <summary>Fired by TransactionController when a buy fails due to insufficient funds.
+    /// Parameters: item price gap the player needs, current interest rate.</summary>
+    public static Action<float, float> OnLoanOffered;
+
+    /// <summary>Fired by LoanManager when player confirms a loan — TransactionController should retry Buy.</summary>
+    public static Action OnLoanConfirmed;
 
     // ── Day / Game State ───────────────────────────
     /// <summary>Fired when the day's auction phase should begin.</summary>
@@ -66,6 +74,8 @@ public static class GameEvents
         OnShopClosed = null;
         OnAuctionComplete = null;
         OnGameOver = null;
+        OnLoanOffered = null;
+        OnLoanConfirmed = null;
     }
 }
 
@@ -73,5 +83,6 @@ public enum GameOverReason
 {
     Arrest,
     Bankruptcy,
-    MissedQuota
+    MissedQuota,
+    LoanNotRepaid
 }
