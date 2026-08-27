@@ -39,11 +39,13 @@ public class Pickup : MonoBehaviour
     void OnEnable()
     {
         GameEvents.OnDecisionMade += OnDecisionMade;
+        GameEvents.OnShopClosed   += OnShopClosed;
     }
 
     void OnDisable()
     {
         GameEvents.OnDecisionMade -= OnDecisionMade;
+        GameEvents.OnShopClosed   -= OnShopClosed;
     }
 
     void Update()
@@ -53,7 +55,13 @@ public class Pickup : MonoBehaviour
             if (inspectedItem == null)
                 TryPickup();
             else
-                ReturnToCounter();
+                ForceReturnItem();
+        }
+
+        // Safety fallback: if item was destroyed but we're still rotating
+        if (inspectedItem == null && isRotating)
+        {
+            ReleaseItem();
         }
 
         HandleRotation();
@@ -78,6 +86,13 @@ public class Pickup : MonoBehaviour
 
         if (item.State == ItemState.AtCounter)
         {
+            // Drop clipboard if it's currently being viewed
+            var clipboard = FindObjectOfType<ClipboardController>();
+            if (clipboard != null && clipboard.IsAtView)
+            {
+                clipboard.MoveToIdle();
+            }
+
             inspectedItem = item;
             item.MoveToView();
             Debug.Log("[Pickup] Item picked up for inspection.");
@@ -88,7 +103,7 @@ public class Pickup : MonoBehaviour
     //  RETURN
     // ─────────────────────────────────────────────────
 
-    private void ReturnToCounter()
+    public void ForceReturnItem()
     {
         if (inspectedItem == null) return;
 
@@ -178,6 +193,12 @@ public class Pickup : MonoBehaviour
     private void OnDecisionMade(bool wasBought)
     {
         // ItemSpawner handles moving the item — we just let go of our reference
+        ReleaseItem();
+    }
+
+    private void OnShopClosed()
+    {
+        // Force drop item and unlock cursor when the day ends
         ReleaseItem();
     }
 }

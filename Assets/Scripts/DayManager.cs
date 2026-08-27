@@ -10,7 +10,7 @@ using System.Collections.Generic;
 public class DayManager : MonoBehaviour
 {
     [Header("Scene References")]
-    [SerializeField] private ScreenFader        screenFader;
+    [SerializeField] private ShutterDoor        shutterDoor;
     [SerializeField] private RoundTimer         roundTimer;
     [SerializeField] private PurchasedInventory purchasedInventory;
     [SerializeField] private Ledger             ledger;
@@ -43,8 +43,11 @@ public class DayManager : MonoBehaviour
         // Read day number from GameManager; default to 1 for isolated scene testing
         currentDay = GameManager.Instance != null ? GameManager.Instance.currentDay : 1;
 
-        // Begin the day intro (black screen → "DAY X" → fade out → open shop)
-        screenFader.ShowDayIntro(currentDay, OpenShop);
+        // Begin the day intro (door closed → "DAY X" → open door → open shop)
+        if (shutterDoor != null)
+            shutterDoor.ShowDayIntro(currentDay, OpenShop);
+        else
+            OpenShop();
     }
 
     // ─────────────────────────────────────────────────
@@ -85,15 +88,18 @@ public class DayManager : MonoBehaviour
 
     private IEnumerator DayEndSequence()
     {
-        // Stop any competing fades
-        screenFader.StopAllCoroutines();
+        // Stop any competing door movements
+        if (shutterDoor != null) shutterDoor.StopAllCoroutines();
 
-        // Fade to black and wait for it to finish
-        bool fadeComplete = false;
-        screenFader.FadeToBlack(() => fadeComplete = true);
-        while (!fadeComplete) yield return null;
+        // Close door and wait for it to finish
+        bool transitionComplete = false;
+        if (shutterDoor != null)
+        {
+            shutterDoor.CloseDoor(() => transitionComplete = true);
+            while (!transitionComplete) yield return null;
+        }
 
-        Debug.Log("[DayManager] Fade to black complete. Resolving auction...");
+        Debug.Log("[DayManager] Door closed. Resolving auction...");
 
         // Resolve auction
         List<PurchasedItem> results = auctionResolver.Resolve();
@@ -117,11 +123,8 @@ public class DayManager : MonoBehaviour
 
         Debug.Log($"[DayManager] Showing auction panel with {results.Count} items. Total: ${totalEarned:F0} | Loan repaid: {loanWasRepaid}");
 
-        // Show auction panel ON TOP of the black screen
+        // Show auction panel (UI hidden array in ShutterDoor ensures it doesn't overlap behind)
         auctionResultsPanel.Show(results, totalEarned, loanWasRepaid);
-
-        // Disable blocksRaycasts so clicks pass through the black screen to the Auction panel
-        screenFader.SetBlocksRaycasts(false);
     }
 
     // ─────────────────────────────────────────────────
@@ -136,9 +139,6 @@ public class DayManager : MonoBehaviour
 
         // Hide the auction panel FIRST so it doesn't overlap with Game Over screens
         auctionResultsPanel.Hide();
-
-        // Re-enable blocksRaycasts so the black screen covers everything (like buttons behind it)
-        screenFader.SetBlocksRaycasts(true);
 
         float profitEarnedToday = endOfDayCash - netWorthAtDayStart;
 
@@ -165,7 +165,10 @@ public class DayManager : MonoBehaviour
         purchasedInventory.Clear();
         roundTimer?.ResetTimer();
 
-        // Show the next day intro (stays black → shows "DAY X" → fades out → OpenShop)
-        screenFader.ShowDayIntro(currentDay, OpenShop);
+        // Show the next day intro (door closed → shows "DAY X" → opens door → OpenShop)
+        if (shutterDoor != null)
+            shutterDoor.ShowDayIntro(currentDay, OpenShop);
+        else
+            OpenShop();
     }
 }
