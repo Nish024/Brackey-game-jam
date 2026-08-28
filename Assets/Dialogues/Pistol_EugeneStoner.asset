@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4a33f894b2b440a0c98d90dc2de4f, type: 3}
+  m_Name: Pistol_EugeneStoner
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  specialistName: Eugene Stoner
+  callFee: 40
+  startNodeID: start
+  nodes:
+  - nodeID: start
+    speaker: 0
+    text: Got a pistol here, guy's asking $650. Says it's the real deal.
+    inspectionHintID: 
+    nextNodeID: greet
+    choices: []
+  - nodeID: greet
+    speaker: 1
+    text: Alright, walk me through what you're seeing on it.
+    inspectionHintID: 
+    nextNodeID: hub
+    choices: []
+  - nodeID: hub
+    speaker: 0
+    text: 
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: It's got a logo on the handle.
+      nextNodeID: logo_ask
+    - choiceText: There's engraving on the slide.
+      nextNodeID: engrave_ask
+    - choiceText: Finish looks chrome or nickel.
+      nextNodeID: chrome_info
+    - choiceText: Grip panels are wood.
+      nextNodeID: wood_info
+    - choiceText: No, I think I've got what I need.
+      nextNodeID: end
+  - nodeID: logo_ask
+    speaker: 1
+    text: "What's the logo \u2014 a bullet shape?"
+    inspectionHintID: 
+    nextNodeID: logo_choice
+    choices: []
+  - nodeID: logo_choice
+    speaker: 0
+    text: 
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: Yeah, looks like a bullet.
+      nextNodeID: logo_bullet_info
+    - choiceText: Something else, not sure.
+      nextNodeID: logo_other_info
+  - nodeID: logo_bullet_info
+    speaker: 1
+    text: Then the handle should be red, that's factory spec for that line. Serial
+      number should fall between 345 and 760.
+    inspectionHintID: pistol_bullet_logo
+    nextNodeID: hub
+    choices: []
+  - nodeID: logo_other_info
+    speaker: 1
+    text: Hm, without knowing the exact logo I can't tell you much. Get a closer
+      look and call back if you can make it out.
+    inspectionHintID: 
+    nextNodeID: hub
+    choices: []
+  - nodeID: engrave_ask
+    speaker: 1
+    text: Star-shaped?
+    inspectionHintID: 
+    nextNodeID: engrave_choice
+    choices: []
+  - nodeID: engrave_choice
+    speaker: 0
+    text: 
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: Yeah, it's a star.
+      nextNodeID: engrave_star_info
+    - choiceText: No, different shape.
+      nextNodeID: engrave_other_info
+  - nodeID: engrave_star_info
+    speaker: 1
+    text: Then grip color should be black, no exceptions on that combo. Serial number
+      should start with a 7.
+    inspectionHintID: pistol_star_engraving
+    nextNodeID: hub
+    choices: []
+  - nodeID: engrave_other_info
+    speaker: 1
+    text: Not something I can cross-reference off the top of my head. Star engraving's
+      the one with known specs.
+    inspectionHintID: 
+    nextNodeID: hub
+    choices: []
+  - nodeID: chrome_info
+    speaker: 1
+    text: If it's genuinely chrome or nickel, manufacture year should be after 1990.
+      And the serial shouldn't contain a zero anywhere.
+    inspectionHintID: pistol_chrome_finish
+    nextNodeID: hub
+    choices: []
+  - nodeID: wood_info
+    speaker: 1
+    text: Trigger guard should be rounded, not squared, to match that grip style.
+      Serial number needs to be under 500.
+    inspectionHintID: pistol_wood_grip
+    nextNodeID: hub
+    choices: []
+  - nodeID: end
+    speaker: 1
+    text: Alright. Go through it careful before you hand over any cash. Good luck.
+    inspectionHintID: 
+    nextNodeID: 
+    choices: []

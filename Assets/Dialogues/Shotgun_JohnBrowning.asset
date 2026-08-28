@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4a33f894b2b440a0c98d90dc2de4f, type: 3}
+  m_Name: Shotgun_JohnBrowning
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  specialistName: John Browning
+  callFee: 45
+  startNodeID: start
+  nodes:
+  - nodeID: start
+    speaker: 0
+    text: Got a shotgun here, guy's asking $700.
+    inspectionHintID: 
+    nextNodeID: greet
+    choices: []
+  - nodeID: greet
+    speaker: 1
+    text: Alright, tell me what stands out on it.
+    inspectionHintID: 
+    nextNodeID: hub
+    choices: []
+  - nodeID: hub
+    speaker: 0
+    text: 
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: There's an engraved stamp on the receiver.
+      nextNodeID: engrave_info
+    - choiceText: It's got a double trigger.
+      nextNodeID: double_trigger_info
+    - choiceText: Handle's black.
+      nextNodeID: black_handle_info
+    - choiceText: There's a vent rib on top of the barrel.
+      nextNodeID: vent_rib_info
+    - choiceText: No, that's all.
+      nextNodeID: end
+  - nodeID: engrave_info
+    speaker: 1
+    text: If that engraving's legit, the stock should be wood. Serial number should
+      fall between 150 and 500.
+    inspectionHintID: shotgun_engraved_receiver
+    nextNodeID: hub
+    choices: []
+  - nodeID: double_trigger_info
+    speaker: 1
+    text: Then the barrel should be side-by-side, not stacked. Serial number should
+      start with a 2.
+    inspectionHintID: shotgun_double_trigger
+    nextNodeID: hub
+    choices: []
+  - nodeID: black_handle_info
+    speaker: 1
+    text: If it's genuinely black, manufacture year should be before 1960. Serial
+      number shouldn't contain a 5 anywhere.
+    inspectionHintID: shotgun_black_handle
+    nextNodeID: hub
+    choices: []
+  - nodeID: vent_rib_info
+    speaker: 1
+    text: Stock should be green on that configuration. Serial number needs to be
+      under 700.
+    inspectionHintID: shotgun_vent_rib
+    nextNodeID: hub
+    choices: []
+  - nodeID: end
+    speaker: 1
+    text: Alright, check it careful. Good luck.
+    inspectionHintID: 
+    nextNodeID: 
+    choices: []
