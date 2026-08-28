@@ -7,7 +7,9 @@ using TMPro;
 /// </summary>
 public class NetWorthDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI netWorthText;
+    [Header("References")]
+    [Tooltip("The text component to display the net worth (supports UI or 3D Text).")]
+    [SerializeField] private TMP_Text netWorthText;
 
     [Tooltip("Format prefix shown before the number.")]
     [SerializeField] private string prefix = "$";

@@ -3,7 +3,9 @@ using TMPro;
 
 public class ProfitTargetDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI targetText;
+    [Header("References")]
+    [Tooltip("The text component to display the profit target (supports UI or 3D Text).")]
+    [SerializeField] private TMP_Text targetText;
 
     void Start()
     {

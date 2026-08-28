@@ -116,55 +116,29 @@ public class TransactionController : MonoBehaviour
     private void OnCustomerArrived()
     {
         decisionPending = true;
+    }
 
-        // --- RANDOMIZED STATE FOR TESTING ---
-        currentIsFake = false;
-        currentIsStolen = false;
-        actualRarity = ItemRarity.Good;
-        claimedRarity = ItemRarity.Good;
+    /// <summary>
+    /// Called by ItemSpawner after a gun is spawned to inject the actual data card.
+    /// </summary>
+    public void SetGunData(GunData data)
+    {
+        currentIsFake = data.actualState == GunState.Fake;
+        currentIsStolen = data.actualState == GunState.Stolen;
+        actualRarity = data.actualRarity;
+        claimedRarity = data.claimedRarity;
 
-        float r = Random.value;
-        if (r < 0.2f)
-        {
-            currentIsStolen = true;
-            actualRarity = Random.value > 0.5f ? ItemRarity.Good : ItemRarity.Rare;
-            claimedRarity = actualRarity; // Stolen items usually claim their real rarity
-        }
-        else if (r < 0.4f)
-        {
-            currentIsFake = true;
-            actualRarity = ItemRarity.Good; // It's fake, so actual rarity doesn't matter much
-            claimedRarity = Random.value > 0.5f ? ItemRarity.Good : ItemRarity.Rare; // Bluffing
-        }
-        else if (r < 0.7f)
-        {
-            actualRarity = ItemRarity.Good;
-            claimedRarity = ItemRarity.Good; // Genuine Good
-        }
-        else
-        {
-            actualRarity = ItemRarity.Rare;
-            claimedRarity = ItemRarity.Rare; // Genuine Rare
-        }
-
-        // Calculate Prices
-        float baseItemValue = Random.Range(100f, 500f);
+        honestBasePrice = currentIsFake ? 0f : data.baseValue;
         
-        // Honest Price
-        honestBasePrice = currentIsFake ? 0f : (actualRarity == ItemRarity.Rare ? baseItemValue * 3f : baseItemValue);
-        
-        // Asking Price (based on claim)
-        float claimedValue = claimedRarity == ItemRarity.Rare ? baseItemValue * 3f : baseItemValue;
-        askingPrice = claimedValue * Random.Range(0.8f, 1.2f); // Slight haggling variance
-        
-        currentItemPrice = askingPrice; // The price they initially ask for
+        // Random asking price between min and max from the data card
+        askingPrice = Random.Range(data.minAskPrice, data.maxAskPrice);
+        currentItemPrice = askingPrice;
 
         if (itemStateText != null)
         {
             string actualStr = currentIsFake ? "FAKE" : currentIsStolen ? $"STOLEN ({actualRarity})" : actualRarity.ToString();
             itemStateText.text = $"Actual: {actualStr}\nClaim: {claimedRarity}";
         }
-        // ----------------------------------------------
     }
 
     private void OnShopClosed()

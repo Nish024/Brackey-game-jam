@@ -24,11 +24,20 @@ public static class GameEvents
     /// <summary>Fired when a customer has arrived at the counter and is ready.</summary>
     public static Action OnCustomerReady;
 
+    /// <summary>Fired by ItemSpawner when a gun with GunData is spawned.</summary>
+    public static Action<GunData> OnGunDataLoaded;
+
     /// <summary>Fired when the item has physically arrived at the counter.</summary>
     public static Action OnItemArrivedAtCounter;
 
     /// <summary>Fired when the current customer has fully left the screen.</summary>
     public static Action OnCustomerLeft;
+
+    /// <summary>Fired when the mouse pointer enters the customer's 3D collider.</summary>
+    public static Action OnCustomerHoverEnter;
+
+    /// <summary>Fired when the mouse pointer exits the customer's 3D collider.</summary>
+    public static Action OnCustomerHoverExit;
 
     // ── Money ──────────────────────────────────────
     /// <summary>Fired whenever net worth changes, with the new value.</summary>
@@ -68,6 +77,9 @@ public static class GameEvents
         OnCustomerReady = null;
         OnItemArrivedAtCounter = null;
         OnCustomerLeft = null;
+        OnCustomerHoverEnter = null;
+        OnCustomerHoverExit = null;
+        OnGunDataLoaded = null;
         OnNetWorthChanged = null;
         OnDayEnd = null;
         OnShopOpened = null;

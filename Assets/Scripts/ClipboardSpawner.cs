@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 /// <summary>
 /// Spawns a clipboard document whenever a new customer arrives.
@@ -25,10 +26,12 @@ public class ClipboardSpawner : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     private ClipboardController currentClipboard;
+    private GunData pendingData;
 
     void OnEnable()
     {
         GameEvents.OnCustomerReady += SpawnClipboard;
+        GameEvents.OnGunDataLoaded += HandleGunDataLoaded;
         GameEvents.OnDecisionMade += OnDecisionMade;
         GameEvents.OnShopClosed += OnShopClosed;
     }
@@ -36,6 +39,7 @@ public class ClipboardSpawner : MonoBehaviour
     void OnDisable()
     {
         GameEvents.OnCustomerReady -= SpawnClipboard;
+        GameEvents.OnGunDataLoaded -= HandleGunDataLoaded;
         GameEvents.OnDecisionMade -= OnDecisionMade;
         GameEvents.OnShopClosed -= OnShopClosed;
     }
@@ -63,6 +67,33 @@ public class ClipboardSpawner : MonoBehaviour
 
         // Tell it to move to the counter (idle position)
         currentClipboard.MoveToIdle();
+
+        if (pendingData != null)
+        {
+            ApplyData(pendingData);
+            pendingData = null;
+        }
+    }
+
+    private void HandleGunDataLoaded(GunData data)
+    {
+        if (currentClipboard != null)
+        {
+            ApplyData(data);
+        }
+        else
+        {
+            pendingData = data;
+        }
+    }
+
+    private void ApplyData(GunData data)
+    {
+        var display = currentClipboard.GetComponent<ClipboardDataDisplay>();
+        if (display != null)
+        {
+            display.Populate(data);
+        }
     }
 
     private void OnDecisionMade(bool wasBought)

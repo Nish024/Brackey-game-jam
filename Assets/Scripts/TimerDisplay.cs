@@ -7,7 +7,9 @@ using TMPro;
 /// </summary>
 public class TimerDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI timerText;
+    [Header("References")]
+    [Tooltip("The text component to display the timer (supports UI or 3D Text).")]
+    [SerializeField] private TMP_Text timerText;
 
     void OnEnable()
     {

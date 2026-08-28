@@ -8,8 +8,8 @@ using TMPro;
 public class PriceDisplay : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("The TextMeshPro component that shows the price.")]
-    [SerializeField] private TextMeshProUGUI priceText;
+    [Tooltip("The text component that shows the price (supports UI or 3D text).")]
+    [SerializeField] private TMP_Text priceText;
     
     [Tooltip("Needed to read the current price.")]
     [SerializeField] private TransactionController transactionController;
@@ -25,14 +25,16 @@ public class PriceDisplay : MonoBehaviour
 
     void OnEnable()
     {
-        GameEvents.OnItemArrivedAtCounter += ShowPrice;
+        GameEvents.OnCustomerHoverEnter += ShowPrice;
+        GameEvents.OnCustomerHoverExit += HidePrice;
         GameEvents.OnDecisionMade += HidePrice;
         GameEvents.OnNextCustomerRequested += HidePrice;
     }
 
     void OnDisable()
     {
-        GameEvents.OnItemArrivedAtCounter -= ShowPrice;
+        GameEvents.OnCustomerHoverEnter -= ShowPrice;
+        GameEvents.OnCustomerHoverExit -= HidePrice;
         GameEvents.OnDecisionMade -= HidePrice;
         GameEvents.OnNextCustomerRequested -= HidePrice;
     }

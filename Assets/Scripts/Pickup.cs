@@ -26,6 +26,10 @@ public class Pickup : MonoBehaviour
     private float targetFOV;
     private Camera mainCam;
 
+    [Header("Inspection Objects")]
+    [Tooltip("Objects that should only be active while inspecting an item (e.g. Spotlights, Scale Ruler).")]
+    [SerializeField] private GameObject[] inspectionOnlyObjects;
+
     void Awake()
     {
         mainCam = Camera.main;
@@ -40,6 +44,8 @@ public class Pickup : MonoBehaviour
     {
         GameEvents.OnDecisionMade += OnDecisionMade;
         GameEvents.OnShopClosed   += OnShopClosed;
+        
+        SetInspectionObjectsActive(false);
     }
 
     void OnDisable()
@@ -95,6 +101,7 @@ public class Pickup : MonoBehaviour
 
             inspectedItem = item;
             item.MoveToView();
+            SetInspectionObjectsActive(true);
             Debug.Log("[Pickup] Item picked up for inspection.");
         }
     }
@@ -188,6 +195,16 @@ public class Pickup : MonoBehaviour
         }
         inspectedItem = null;
         targetFOV = defaultFOV; // Reset zoom
+        SetInspectionObjectsActive(false);
+    }
+
+    private void SetInspectionObjectsActive(bool active)
+    {
+        if (inspectionOnlyObjects == null) return;
+        foreach (var obj in inspectionOnlyObjects)
+        {
+            if (obj != null) obj.SetActive(active);
+        }
     }
 
     private void OnDecisionMade(bool wasBought)

@@ -89,6 +89,14 @@ public class ItemSpawner : MonoBehaviour
         currentItem.Init(itemSpawnPos, viewPos, itemBoughtPos, itemMoveSpeed);
         currentItem.MoveToCounter();
 
+        // Check if the item has GunData, and pass it along
+        GunDataHolder dataHolder = obj.GetComponent<GunDataHolder>();
+        if (dataHolder != null && dataHolder.Data != null)
+        {
+            transactionController?.SetGunData(dataHolder.Data);
+            GameEvents.OnGunDataLoaded?.Invoke(dataHolder.Data);
+        }
+
         Debug.Log("[ItemSpawner] Item spawned.");
     }
 
