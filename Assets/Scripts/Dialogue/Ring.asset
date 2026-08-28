@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4a33f894b2b440a0c98d90dc2de4f, type: 3}
+  m_Name: Ring
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  specialistName: Ring Specialist
+  callFee: 45
+  startNodeID: Player1
+  nodes:
+  - nodeID: Player1
+    speaker: 1
+    text: Hey
+    inspectionHintID: 
+    nextNodeID: Specialist1
+    choices:
+    - choiceText: I got a Ring
+      nextNodeID: Specialist1
+    - choiceText: 'I got a Necklace '
+      nextNodeID: Specialist2
+  - nodeID: Specialist1
+    speaker: 1
+    text: Ooh, good one to check. Could be a real steal or a total fake
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: 
+      nextNodeID: 
+  - nodeID: Specialist2
+    speaker: 1
+    text: Bruh, why is it a necklace
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: 
+      nextNodeID: 

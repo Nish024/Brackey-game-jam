@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4a33f894b2b440a0c98d90dc2de4f, type: 3}
+  m_Name: Pistol
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  specialistName: Pistol Expert
+  callFee: 45
+  startNodeID: Intro
+  nodes:
+  - nodeID: Intro
+    speaker: 1
+    text: "Got a pistol here \u2014 guy says it's a genuine Glock 17, asking $600."
+    inspectionHintID: 
+    nextNodeID: ExpertIntro
+    choices: []
+  - nodeID: ExpertIntro
+    speaker: 1
+    text: Ooh, Glocks get faked a lot cause they're so common. Could be legit or
+      a cheap knockoff worth checking close.
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: What should I check first?
+      nextNodeID: SerialCheckExpert
+  - nodeID: SerialCheckExpert
+    speaker: 1
+    text: Serial number, should be on the frame near the trigger guard. Real ones
+      are laser-crisp, even depth all the way through. If it looks shallow or hand-done,
+      that's bad.
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: What about the slide?
+      nextNodeID: SlidesCheckExpert
+    - choiceText: Anything else?
+      nextNodeID: GripCheckExpert
+  - nodeID: SlidesCheckExpert
+    speaker: 1
+    text: "Check the finish \u2014 Glocks use a matte black coating, real consistent,
+      no shiny patches or paint-like texture. Also rack the slide, should move smooth
+      with firm, even resistance."
+    inspectionHintID: 
+    nextNodeID: 
+    choices: []
+  - nodeID: GripCheckExpert
+    speaker: 1
+    text: "Yeah, feel the grip texture \u2014 factory stippling pattern is sharp
+      and uniform. Fakes usually feel mushy or the pattern's slightly off. And check
+      the trigger pull, shouldn't wobble side to side."
+    inspectionHintID: 
+    nextNodeID: 
+    choices: []

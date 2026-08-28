@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f4a33f894b2b440a0c98d90dc2de4f, type: 3}
+  m_Name: Rifle_MikhailKalashnikov
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  specialistName: Mikhail Kalashnikov
+  callFee: 45
+  startNodeID: start
+  nodes:
+  - nodeID: start
+    speaker: 0
+    text: Got a rifle here, guy's asking $900.
+    inspectionHintID: 
+    nextNodeID: greet
+    choices: []
+  - nodeID: greet
+    speaker: 1
+    text: "Let's see what's on it \u2014 tell me what you notice."
+    inspectionHintID: 
+    nextNodeID: hub
+    choices: []
+  - nodeID: hub
+    speaker: 0
+    text: 
+    inspectionHintID: 
+    nextNodeID: 
+    choices:
+    - choiceText: Star stamp on the receiver.
+      nextNodeID: star_info
+    - choiceText: There's a bayonet lug under the barrel.
+      nextNodeID: bayonet_info
+    - choiceText: Stock is black.
+      nextNodeID: black_stock_info
+    - choiceText: It's got a scope mounted.
+      nextNodeID: scope_info
+    - choiceText: No, that's all.
+      nextNodeID: end
+  - nodeID: star_info
+    speaker: 1
+    text: If that stamp's genuine, the stock should be wood. Serial number should
+      fall between 200 and 650.
+    inspectionHintID: rifle_star_stamp
+    nextNodeID: hub
+    choices: []
+  - nodeID: bayonet_info
+    speaker: 1
+    text: "Check the barrel finish \u2014 should be matte, not glossy. Serial number
+      should start with a 4."
+    inspectionHintID: rifle_bayonet_lug
+    nextNodeID: hub
+    choices: []
+  - nodeID: black_stock_info
+    speaker: 1
+    text: If it's genuinely black, manufacture year should be after 1985. Serial
+      number shouldn't contain a 9 anywhere.
+    inspectionHintID: rifle_black_stock
+    nextNodeID: hub
+    choices: []
+  - nodeID: scope_info
+    speaker: 1
+    text: Trigger guard should be metal on that setup. Serial number should be under
+      800.
+    inspectionHintID: rifle_scope
+    nextNodeID: hub
+    choices: []
+  - nodeID: end
+    speaker: 1
+    text: Alright, look it over careful. Good luck.
+    inspectionHintID: 
+    nextNodeID: 
+    choices: []
