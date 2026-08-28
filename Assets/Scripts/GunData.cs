@@ -10,21 +10,24 @@ public class GunData : ScriptableObject
     public string barrelLength = "4.5 inches";
     public string yearManufactured = "2004";
 
-    [Header("Manufacturer & Logo")]
-    public string legitimateManufacturer = "Steyr Arms";
-    public string claimedManufacturer = "Steyr Arms";
-    [Tooltip("The logo texture to apply to the gun's grip/body.")]
-    public Texture2D logoTexture;
+    [Header("Manufacturer & Logos")]
+    [Tooltip("All possible manufacturer logos for this gun model.")]
+    public Sprite[] manufacturerLogos;
 
-    [Header("State Info")]
-    public GunState actualState = GunState.Legit;
+    [Tooltip("The matching manufacturer name for each logo (must be same length as Manufacturer Logos).")]
+    public string[] manufacturerNames;
+
+    [Tooltip("Which index in the above arrays is the REAL/LEGITIMATE manufacturer.")]
+    public int legitimateLogoIndex = 0;
+
+    [Header("Rarity Info")]
     public ItemRarity actualRarity = ItemRarity.Good;
     public ItemRarity claimedRarity = ItemRarity.Good;
 
     [Header("Pricing")]
     public float minAskPrice = 500f;
     public float maxAskPrice = 900f;
-    
+
     [Tooltip("The true, honest base value of this item if legit.")]
     public float baseValue = 500f;
 }

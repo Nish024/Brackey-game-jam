@@ -93,8 +93,8 @@ public class ItemSpawner : MonoBehaviour
         GunDataHolder dataHolder = obj.GetComponent<GunDataHolder>();
         if (dataHolder != null && dataHolder.Data != null)
         {
-            transactionController?.SetGunData(dataHolder.Data);
-            GameEvents.OnGunDataLoaded?.Invoke(dataHolder.Data);
+            transactionController?.SetGunData(dataHolder.Data, dataHolder.ResolvedState);
+            GameEvents.OnGunDataLoaded?.Invoke(dataHolder.Data, dataHolder.SelectedManufacturerName);
         }
 
         Debug.Log("[ItemSpawner] Item spawned.");

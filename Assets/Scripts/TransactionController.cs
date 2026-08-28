@@ -119,17 +119,18 @@ public class TransactionController : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by ItemSpawner after a gun is spawned to inject the actual data card.
+    /// Called by ItemSpawner after a gun is spawned.
+    /// resolvedState comes from GunDataHolder (computed from logo pick at runtime).
     /// </summary>
-    public void SetGunData(GunData data)
+    public void SetGunData(GunData data, GunState resolvedState)
     {
-        currentIsFake = data.actualState == GunState.Fake;
-        currentIsStolen = data.actualState == GunState.Stolen;
+        currentIsFake = resolvedState == GunState.Fake;
+        currentIsStolen = resolvedState == GunState.Stolen;
         actualRarity = data.actualRarity;
         claimedRarity = data.claimedRarity;
 
         honestBasePrice = currentIsFake ? 0f : data.baseValue;
-        
+
         // Random asking price between min and max from the data card
         askingPrice = Random.Range(data.minAskPrice, data.maxAskPrice);
         currentItemPrice = askingPrice;

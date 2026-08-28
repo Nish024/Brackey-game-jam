@@ -2,37 +2,54 @@ using UnityEngine;
 
 /// <summary>
 /// Attached to the root of a Gun Prefab.
-/// Holds the GunData (ScriptableObject) for this specific variant.
-/// Automatically applies the logo texture when spawned.
+/// At runtime, randomly picks one logo from GunData's logo array.
+/// If the picked logo is NOT the legitimate one, the gun is automatically Fake.
 /// </summary>
 public class GunDataHolder : MonoBehaviour
 {
     [SerializeField] private GunData data;
-    
+
     [Header("Logo Swapping")]
-    [Tooltip("The renderer that displays the logo.")]
-    [SerializeField] private MeshRenderer logoRenderer;
-    [Tooltip("The material index on the renderer that holds the logo.")]
-    [SerializeField] private int logoMaterialIndex = 0;
+    [Tooltip("The SpriteRenderer that displays the logo on the grip.")]
+    [SerializeField] private SpriteRenderer logoRenderer;
 
+    // ── Resolved at runtime ──
     public GunData Data => data;
+    public GunState ResolvedState { get; private set; }
+    public string SelectedManufacturerName { get; private set; }
 
-    void Start()
+    void Awake()
     {
-        ApplyLogo();
+        ResolveVariant();
     }
 
-    private void ApplyLogo()
+    private void ResolveVariant()
     {
-        if (data == null || data.logoTexture == null) return;
-        if (logoRenderer == null) return;
+        if (data == null) return;
+        if (data.manufacturerLogos == null || data.manufacturerLogos.Length == 0) return;
 
-        // Apply the texture to the specific material slot
-        var materials = logoRenderer.materials;
-        if (logoMaterialIndex >= 0 && logoMaterialIndex < materials.Length)
-        {
-            materials[logoMaterialIndex].mainTexture = data.logoTexture;
-            logoRenderer.materials = materials; // Reassign to apply changes
-        }
+        // Randomly pick one logo from the array
+        int picked = Random.Range(0, data.manufacturerLogos.Length);
+
+        // Determine state: if it's not the legit logo, it's fake
+        ResolvedState = (picked == data.legitimateLogoIndex) ? GunState.Legit : GunState.Fake;
+
+        // Resolve manufacturer name
+        if (data.manufacturerNames != null && picked < data.manufacturerNames.Length)
+            SelectedManufacturerName = data.manufacturerNames[picked];
+        else
+            SelectedManufacturerName = "Unknown";
+
+        // Apply the picked logo texture to the mesh
+        ApplyLogo(data.manufacturerLogos[picked]);
+
+        Debug.Log($"[GunDataHolder] '{data.gunModelName}' spawned with logo #{picked} " +
+                  $"({SelectedManufacturerName}) → State: {ResolvedState}");
+    }
+
+    private void ApplyLogo(Sprite logo)
+    {
+        if (logo == null || logoRenderer == null) return;
+        logoRenderer.sprite = logo;
     }
 }

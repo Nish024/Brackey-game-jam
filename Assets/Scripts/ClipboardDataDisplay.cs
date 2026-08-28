@@ -14,7 +14,7 @@ public class ClipboardDataDisplay : MonoBehaviour
     [SerializeField] private TMP_Text yearText;
     [SerializeField] private TMP_Text manufacturerText;
 
-    public void Populate(GunData data)
+    public void Populate(GunData data, string manufacturerName)
     {
         if (data == null) return;
 
@@ -23,6 +23,6 @@ public class ClipboardDataDisplay : MonoBehaviour
         if (caliberText != null) caliberText.text = $"Caliber: {data.caliber}";
         if (barrelLengthText != null) barrelLengthText.text = $"Barrel: {data.barrelLength}";
         if (yearText != null) yearText.text = $"Year: {data.yearManufactured}";
-        if (manufacturerText != null) manufacturerText.text = $"Mfr: {data.claimedManufacturer}";
+        if (manufacturerText != null) manufacturerText.text = $"Mfr: {manufacturerName}";
     }
 }
