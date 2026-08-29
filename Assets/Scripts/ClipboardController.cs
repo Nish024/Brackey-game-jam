@@ -66,6 +66,8 @@ public class ClipboardController : MonoBehaviour
             var pickup = FindObjectOfType<Pickup>();
             if (pickup != null) pickup.ForceReturnItem();
             
+
+            
             MoveToView();
         }
     }

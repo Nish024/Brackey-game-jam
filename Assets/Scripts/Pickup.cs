@@ -25,6 +25,23 @@ public class Pickup : MonoBehaviour
     private float defaultFOV;
     private float targetFOV;
     private Camera mainCam;
+    
+    public static float ZoomRatio = 1f;
+
+    private PhoneController _phone;
+    private ClipboardController _clipboard;
+
+    private PhoneController GetPhone()
+    {
+        if (_phone == null) _phone = FindObjectOfType<PhoneController>();
+        return _phone;
+    }
+
+    private ClipboardController GetClipboard()
+    {
+        if (_clipboard == null) _clipboard = FindObjectOfType<ClipboardController>();
+        return _clipboard;
+    }
 
     [Header("Inspection Objects")]
     [Tooltip("Objects that should only be active while inspecting an item (e.g. Spotlights, Scale Ruler).")]
@@ -99,6 +116,13 @@ public class Pickup : MonoBehaviour
                 clipboard.MoveToIdle();
             }
 
+            // Drop phone if it's currently being viewed
+            var phone = FindObjectOfType<PhoneController>();
+            if (phone != null && phone.IsAtView)
+            {
+                phone.MoveToIdle();
+            }
+
             inspectedItem = item;
             item.MoveToView();
             SetInspectionObjectsActive(true);
@@ -161,9 +185,12 @@ public class Pickup : MonoBehaviour
     {
         if (mainCam == null) return;
 
-        if (inspectedItem != null)
+        bool isPhoneViewed = GetPhone() != null && GetPhone().IsAtView;
+        bool isClipboardViewed = GetClipboard() != null && GetClipboard().IsAtView;
+
+        if (inspectedItem != null || isPhoneViewed || isClipboardViewed)
         {
-            // Allow zooming only when item is picked up
+            // Allow zooming only when item, phone, or clipboard is picked up
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (Mathf.Abs(scroll) > 0.01f)
             {
@@ -173,12 +200,13 @@ public class Pickup : MonoBehaviour
         }
         else
         {
-            // If no item is picked up, ensure target is default
+            // If nothing is picked up, ensure target is default
             targetFOV = defaultFOV;
         }
 
         // Smoothly interpolate the camera's FOV to the target
         mainCam.fieldOfView = Mathf.Lerp(mainCam.fieldOfView, targetFOV, Time.deltaTime * 15f);
+        ZoomRatio = defaultFOV / mainCam.fieldOfView;
     }
 
     // ─────────────────────────────────────────────────
