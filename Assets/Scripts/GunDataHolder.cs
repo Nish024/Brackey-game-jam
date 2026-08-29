@@ -16,7 +16,6 @@ public class GunDataHolder : MonoBehaviour
     // ── Resolved at runtime ──
     public GunData Data => data;
     public GunState ResolvedState { get; private set; }
-    public string SelectedManufacturerName { get; private set; }
 
     void Awake()
     {
@@ -26,25 +25,28 @@ public class GunDataHolder : MonoBehaviour
     private void ResolveVariant()
     {
         if (data == null) return;
-        if (data.manufacturerLogos == null || data.manufacturerLogos.Length == 0) return;
+        
+        ResolvedState = data.gunState;
 
-        // Randomly pick one logo from the array
-        int picked = Random.Range(0, data.manufacturerLogos.Length);
-
-        // Determine state: if it's not the legit logo, it's fake
-        ResolvedState = (picked == data.legitimateLogoIndex) ? GunState.Legit : GunState.Fake;
-
-        // Resolve manufacturer name
-        if (data.manufacturerNames != null && picked < data.manufacturerNames.Length)
-            SelectedManufacturerName = data.manufacturerNames[picked];
+        // If the gun is supposed to be Fake AND has the LogoChange reason, we swap the logo to a fake one.
+        // Otherwise, we do nothing and let the prefab keep its original legitimate logo!
+        if (ResolvedState == GunState.Fake && data.fakeReason.HasFlag(FakeReason.LogoChange))
+        {
+            if (data.fakeLogoIndices != null && data.fakeLogoIndices.Length > 0)
+            {
+                int picked = data.fakeLogoIndices[Random.Range(0, data.fakeLogoIndices.Length)];
+                
+                if (data.manufacturerLogos != null && picked < data.manufacturerLogos.Length)
+                {
+                    ApplyLogo(data.manufacturerLogos[picked]);
+                    Debug.Log($"[GunDataHolder] '{data.gunModelName}' resolved variant → State: {ResolvedState}, Swapped to Fake Logo: #{picked}");
+                }
+            }
+        }
         else
-            SelectedManufacturerName = "Unknown";
-
-        // Apply the picked logo texture to the mesh
-        ApplyLogo(data.manufacturerLogos[picked]);
-
-        Debug.Log($"[GunDataHolder] '{data.gunModelName}' spawned with logo #{picked} " +
-                  $"({SelectedManufacturerName}) → State: {ResolvedState}");
+        {
+            Debug.Log($"[GunDataHolder] '{data.gunModelName}' resolved variant → State: {ResolvedState}, Kept original prefab logo");
+        }
     }
 
     private void ApplyLogo(Sprite logo)

@@ -14,7 +14,6 @@ public class PurchasedItem
 
     // Hidden truth flags — set by the item system (all false = genuine for now)
     public bool isFake;
-    public ItemRarity rarity;
     public bool isStolen;
 
     // Loan data — set by LoanManager if the item was purchased with a loan
@@ -29,7 +28,7 @@ public class PurchasedItem
         {
             if (isStolen)  return "STOLEN";
             if (isFake)    return "Fake";
-            return $"Genuine ({rarity.ToString()})";
+            return "Genuine";
         }
     }
 }

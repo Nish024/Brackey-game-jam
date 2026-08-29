@@ -24,8 +24,8 @@ public static class GameEvents
     /// <summary>Fired when a customer has arrived at the counter and is ready.</summary>
     public static Action OnCustomerReady;
 
-    /// <summary>Fired by ItemSpawner when a gun with GunData is spawned. Second param is the selected manufacturer name.</summary>
-    public static Action<GunData, string> OnGunDataLoaded;
+    /// <summary>Fired by ItemSpawner when a gun with GunData is spawned.</summary>
+    public static Action<GunData> OnGunDataLoaded;
 
     /// <summary>Fired when the item has physically arrived at the counter.</summary>
     public static Action OnItemArrivedAtCounter;

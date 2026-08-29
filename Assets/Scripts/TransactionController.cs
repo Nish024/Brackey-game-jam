@@ -24,8 +24,6 @@ public class TransactionController : MonoBehaviour
 
     // Randomized states
     private bool currentIsFake;
-    private ItemRarity actualRarity;
-    private ItemRarity claimedRarity;
     private bool currentIsStolen;
 
     private float honestBasePrice;
@@ -84,7 +82,6 @@ public class TransactionController : MonoBehaviour
                 itemName         = currentItemName,
                 purchasePrice    = currentItemPrice,
                 isFake           = currentIsFake,
-                rarity           = actualRarity,
                 isStolen         = currentIsStolen,
                 loanAmount       = loan != null ? loan.amount : 0f,
                 loanInterestRate = loan != null ? loan.rate   : 0f
@@ -126,10 +123,8 @@ public class TransactionController : MonoBehaviour
     {
         currentIsFake = resolvedState == GunState.Fake;
         currentIsStolen = resolvedState == GunState.Stolen;
-        actualRarity = data.actualRarity;
-        claimedRarity = data.claimedRarity;
 
-        honestBasePrice = currentIsFake ? 0f : data.baseValue;
+        honestBasePrice = currentIsFake ? 0f : data.minAskPrice;
 
         // Random asking price between min and max from the data card
         askingPrice = Random.Range(data.minAskPrice, data.maxAskPrice);
@@ -137,8 +132,8 @@ public class TransactionController : MonoBehaviour
 
         if (itemStateText != null)
         {
-            string actualStr = currentIsFake ? "FAKE" : currentIsStolen ? $"STOLEN ({actualRarity})" : actualRarity.ToString();
-            itemStateText.text = $"Actual: {actualStr}\nClaim: {claimedRarity}";
+            string actualStr = currentIsFake ? "FAKE" : currentIsStolen ? "STOLEN" : "LEGIT";
+            itemStateText.text = $"Actual: {actualStr}\nClaim: LEGIT";
         }
     }
 

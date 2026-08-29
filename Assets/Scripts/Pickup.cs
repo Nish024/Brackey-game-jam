@@ -164,10 +164,10 @@ public class Pickup : MonoBehaviour
             }
 
             float mouseX = Input.GetAxis("Mouse X") * rotationSensitivity;
-            float mouseY = Input.GetAxis("Mouse Y") * rotationSensitivity;
 
-            inspectedItem.transform.Rotate(Camera.main.transform.up,    -mouseX, Space.World);
-            inspectedItem.transform.Rotate(Camera.main.transform.right,  mouseY, Space.World);
+            // Only rotate horizontally (around the camera's up axis)
+            // This prevents the gun from tumbling out of alignment with the scale
+            inspectedItem.transform.Rotate(Camera.main.transform.up, -mouseX, Space.World);
         }
         else if (isRotating)
         {

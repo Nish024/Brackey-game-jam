@@ -27,7 +27,6 @@ public class ClipboardSpawner : MonoBehaviour
 
     private ClipboardController currentClipboard;
     private GunData pendingData;
-    private string pendingManufacturer;
 
     void OnEnable()
     {
@@ -71,32 +70,30 @@ public class ClipboardSpawner : MonoBehaviour
 
         if (pendingData != null)
         {
-            ApplyData(pendingData, pendingManufacturer);
+            ApplyData(pendingData);
             pendingData = null;
-            pendingManufacturer = null;
         }
     }
 
-    private void HandleGunDataLoaded(GunData data, string selectedManufacturer)
+    private void HandleGunDataLoaded(GunData data)
     {
         if (currentClipboard != null)
         {
-            ApplyData(data, selectedManufacturer);
+            ApplyData(data);
         }
         else
         {
             // Clipboard hasn't spawned yet, hold onto the data
             pendingData = data;
-            pendingManufacturer = selectedManufacturer;
         }
     }
 
-    private void ApplyData(GunData data, string manufacturerName)
+    private void ApplyData(GunData data)
     {
         var display = currentClipboard.GetComponent<ClipboardDataDisplay>();
         if (display != null)
         {
-            display.Populate(data, manufacturerName);
+            display.Populate(data);
         }
     }
 

@@ -54,8 +54,7 @@ public class AuctionResultRow : MonoBehaviour
         {
             statusText.color = item.isFake    ? new Color(0.9f, 0.2f, 0.2f) // red
                              : item.isStolen  ? new Color(0.9f, 0.5f, 0.0f) // orange
-                             : item.rarity == ItemRarity.Rare ? new Color(0.9f, 0.8f, 0.1f) // gold for rare
-                                              : new Color(0.3f, 0.9f, 0.3f); // green for good
+                                              : new Color(0.3f, 0.9f, 0.3f); // green for genuine
         }
     }
 }

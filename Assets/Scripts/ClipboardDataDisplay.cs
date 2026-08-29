@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Attached to the Clipboard prefab. 
@@ -9,20 +10,29 @@ public class ClipboardDataDisplay : MonoBehaviour
 {
     [SerializeField] private TMP_Text gunNameText;
     [SerializeField] private TMP_Text serialNumberText;
-    [SerializeField] private TMP_Text caliberText;
+    [FormerlySerializedAs("caliberText")]
+    [SerializeField] private TMP_Text madeInText;
     [SerializeField] private TMP_Text barrelLengthText;
     [SerializeField] private TMP_Text yearText;
-    [SerializeField] private TMP_Text manufacturerText;
-
-    public void Populate(GunData data, string manufacturerName)
+    public void Populate(GunData data)
     {
         if (data == null) return;
 
         if (gunNameText != null) gunNameText.text = $"Model: {data.gunModelName}";
         if (serialNumberText != null) serialNumberText.text = $"Serial: {data.serialNumber}";
-        if (caliberText != null) caliberText.text = $"Caliber: {data.caliber}";
-        if (barrelLengthText != null) barrelLengthText.text = $"Barrel: {data.barrelLength}";
+        if (madeInText != null) madeInText.text = $"Made in: {FormatCountry(data.madeIn)}";
+        if (barrelLengthText != null) barrelLengthText.text = $"Length: {data.overallLength}";
         if (yearText != null) yearText.text = $"Year: {data.yearManufactured}";
-        if (manufacturerText != null) manufacturerText.text = $"Mfr: {manufacturerName}";
+    }
+
+    private string FormatCountry(CountryOfOrigin country)
+    {
+        switch (country)
+        {
+            case CountryOfOrigin.UnitedStates: return "United States";
+            case CountryOfOrigin.UnitedKingdom: return "United Kingdom";
+            case CountryOfOrigin.SouthKorea: return "South Korea";
+            default: return country.ToString();
+        }
     }
 }

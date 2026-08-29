@@ -9,11 +9,8 @@ using System.Collections.Generic;
 public class AuctionResolver : MonoBehaviour
 {
     [Header("Price Multipliers")]
-    [Tooltip("Good items sell for this multiple of purchase price.")]
-    [SerializeField] private float goodMultiplier = 1.5f;
-
-    [Tooltip("Rare items sell for this multiple of purchase price.")]
-    [SerializeField] private float rareMultiplier = 3.0f;
+    [Tooltip("Genuine items sell for this multiple of purchase price.")]
+    [SerializeField] private float genuineMultiplier = 1.5f;
 
     [Header("References")]
     [SerializeField] private PurchasedInventory inventory;
@@ -46,10 +43,8 @@ public class AuctionResolver : MonoBehaviour
         {
             if (item.isFake)
                 item.salePrice = 0f;
-            else if (item.rarity == ItemRarity.Rare)
-                item.salePrice = Mathf.Round(item.purchasePrice * rareMultiplier);
             else
-                item.salePrice = Mathf.Round(item.purchasePrice * goodMultiplier);
+                item.salePrice = Mathf.Round(item.purchasePrice * genuineMultiplier);
 
             // Deduct loan repayment from this item's sale price
             float repayment = item.LoanRepaymentDue;

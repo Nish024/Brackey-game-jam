@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Spawns one item per customer.
@@ -20,9 +21,7 @@ public class ItemSpawner : MonoBehaviour
     [Tooltip("Where the camera looks when inspecting — set to a Transform in front of the camera.")]
     [SerializeField] private Transform viewPos;
 
-    [Header("Items")]
-    [Tooltip("List of item prefabs to randomly spawn. Must have at least 2 to avoid back-to-back duplicates.")]
-    [SerializeField] private GameObject[] itemPrefabs;
+    // Removed old Item Prefabs array
 
     [Tooltip("How fast the item moves between positions.")]
     [SerializeField] private float itemMoveSpeed = 5f;
@@ -30,8 +29,25 @@ public class ItemSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] private TransactionController transactionController;
 
+    [Header("Daily Spawn Pool (Bag System)")]
+    [SerializeField] private int legitCount = 5;
+    [SerializeField] private int fakeCount = 10;
+    [SerializeField] private int stolenCount = 3;
+    [SerializeField] private int windowSize = 3;
+    
+    [Tooltip("How many unique gun models can show up in a single day?")]
+    [SerializeField] private int maxModelsPerDay = 2;
+
+    [Header("Available Gun Models")]
+    [Tooltip("Drag ONLY the LEGIT/REAL prefabs here. The spawner will extract their fake/stolen variations automatically.")]
+    [SerializeField] private GameObject[] availableModels;
+    [Header("Testing/Debug")]
+    [Tooltip("If assigned, this prefab will always be the very first item spawned each day. Great for testing!")]
+    [SerializeField] private GameObject forceFirstSpawnPrefab;
+
     private ItemController currentItem;
     private int lastSpawnedIndex = -1;
+    private Queue<GameObject> dailyPool = new Queue<GameObject>();
 
     /// <summary>Read by Pickup.cs to find the active ItemController.</summary>
     public ItemController CurrentItem => currentItem;
@@ -41,6 +57,7 @@ public class ItemSpawner : MonoBehaviour
         GameEvents.OnCustomerReady += SpawnItem;
         GameEvents.OnDecisionMade  += OnDecisionMade;
         GameEvents.OnShopClosed    += OnShopClosed;
+        GameEvents.OnShopOpened    += OnShopOpened;
     }
 
     void OnDisable()
@@ -48,6 +65,7 @@ public class ItemSpawner : MonoBehaviour
         GameEvents.OnCustomerReady -= SpawnItem;
         GameEvents.OnDecisionMade  -= OnDecisionMade;
         GameEvents.OnShopClosed    -= OnShopClosed;
+        GameEvents.OnShopOpened    -= OnShopOpened;
     }
 
     // ─────────────────────────────────────────────────
@@ -56,9 +74,9 @@ public class ItemSpawner : MonoBehaviour
 
     private void SpawnItem()
     {
-        if (itemPrefabs == null || itemPrefabs.Length == 0)
+        if (availableModels == null || availableModels.Length == 0)
         {
-            Debug.LogError("[ItemSpawner] No item prefabs assigned!");
+            Debug.LogError("[ItemSpawner] No available models assigned!");
             return;
         }
 
@@ -66,17 +84,30 @@ public class ItemSpawner : MonoBehaviour
         if (currentItem != null)
             Destroy(currentItem.gameObject);
 
-        // Pick a random item, but don't pick the same one twice in a row (if we have more than 1)
-        int randomIndex = Random.Range(0, itemPrefabs.Length);
-        if (itemPrefabs.Length > 1)
+        GameObject prefabToSpawn = null;
+
+        // Try to dequeue from the pre-decided daily pool
+        if (dailyPool != null && dailyPool.Count > 0)
         {
-            while (randomIndex == lastSpawnedIndex)
-            {
-                randomIndex = Random.Range(0, itemPrefabs.Length);
-            }
+            prefabToSpawn = dailyPool.Dequeue();
         }
-        lastSpawnedIndex = randomIndex;
-        GameObject prefabToSpawn = itemPrefabs[randomIndex];
+        else
+        {
+            // Fallback if pool is empty or not configured
+            Debug.LogWarning("[ItemSpawner] Daily spawn pool is empty! Falling back to random selection.");
+            if (availableModels == null || availableModels.Length == 0) return;
+            
+            int randomIndex = Random.Range(0, availableModels.Length);
+            if (availableModels.Length > 1)
+            {
+                while (randomIndex == lastSpawnedIndex)
+                {
+                    randomIndex = Random.Range(0, availableModels.Length);
+                }
+            }
+            lastSpawnedIndex = randomIndex;
+            prefabToSpawn = availableModels[randomIndex];
+        }
 
         GameObject obj = Instantiate(prefabToSpawn, itemSpawnStart.position, itemSpawnStart.rotation);
         obj.tag = "Item";
@@ -94,7 +125,7 @@ public class ItemSpawner : MonoBehaviour
         if (dataHolder != null && dataHolder.Data != null)
         {
             transactionController?.SetGunData(dataHolder.Data, dataHolder.ResolvedState);
-            GameEvents.OnGunDataLoaded?.Invoke(dataHolder.Data, dataHolder.SelectedManufacturerName);
+            GameEvents.OnGunDataLoaded?.Invoke(dataHolder.Data);
         }
 
         Debug.Log("[ItemSpawner] Item spawned.");
@@ -122,5 +153,32 @@ public class ItemSpawner : MonoBehaviour
             Destroy(currentItem.gameObject);
             currentItem = null;
         }
+    }
+
+    private void OnShopOpened()
+    {
+        dailyPool = SpawnPoolBuilder.BuildPool(
+            availableModels,
+            maxModelsPerDay,
+            legitCount,
+            fakeCount,
+            stolenCount,
+            windowSize
+        );
+
+        // Debug override: Inject the forced prefab at the front of the queue
+        if (forceFirstSpawnPrefab != null)
+        {
+            Queue<GameObject> injectedPool = new Queue<GameObject>();
+            injectedPool.Enqueue(forceFirstSpawnPrefab);
+            
+            while (dailyPool.Count > 0)
+            {
+                injectedPool.Enqueue(dailyPool.Dequeue());
+            }
+            dailyPool = injectedPool;
+        }
+
+        Debug.Log($"[ItemSpawner] Daily pool generated with {dailyPool.Count} items.");
     }
 }
