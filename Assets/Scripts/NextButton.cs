@@ -12,6 +12,10 @@ public class NextButton : MonoBehaviour
     [SerializeField] private Button uiButton;
     [SerializeField] private Button3D button3D;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip nextSfx;
+
     private bool timerHasExpired;
 
     void Awake()
@@ -41,6 +45,11 @@ public class NextButton : MonoBehaviour
 
     public void OnNextClicked()
     {
+        if (audioSource != null && nextSfx != null)
+        {
+            audioSource.PlayOneShot(nextSfx);
+        }
+
         SetInteractable(false);
 
         if (timerHasExpired)

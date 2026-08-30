@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &718308439573367863
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 51.31659
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 51.31659
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 51.31659
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.37
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 4.093
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7135789
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.70057493
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -88.946
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_Name
+      value: sillhoette
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3260993364072744591}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8597228538188377213}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5764831526324098254}
+  m_SourcePrefab: {fileID: 100100000, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+--- !u!1 &375655198756090214 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6174bcd1dc2376341b212179ec136ca5, type: 3}
+  m_PrefabInstance: {fileID: 718308439573367863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &3260993364072744591
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375655198756090214}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.040727723, y: 0.03477063, z: 0.0848272}
+  m_Center: {x: 0, y: -0.005806209, z: 0.01008284}
+--- !u!114 &8597228538188377213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375655198756090214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a13b138c7e22f614e93c09f6f18dafa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerHover
+--- !u!114 &5764831526324098254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375655198756090214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1818f78bf1027141a5bf9b8033f88bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialHoverItem
+  descriptionText: 'Customer: They want to sell you their item. It''s your job to
+    figure out if they are telling the truth. Need to hover mouse on them to check
+    how much they are asking'

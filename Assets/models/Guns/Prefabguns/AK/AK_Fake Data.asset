@@ -26,7 +26,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6302a4c221ad97a4983a71a5e3848b68, type: 3}
   - {fileID: 21300000, guid: bcab18e6aaf1c5247b31d7d8b5be1655, type: 3}
   - {fileID: 21300000, guid: 894667c234c738f44bc0ae768a21632c, type: 3}
-  legitimateLogoIndex: 1
   fakeLogoIndices: 
   minAskPrice: 400
   maxAskPrice: 430

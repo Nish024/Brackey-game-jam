@@ -21,6 +21,10 @@ public class AuctionResultsPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI totalEarningsText;
     [SerializeField] private TextMeshProUGUI emptyMessageText; // shown when 0 items bought
     [SerializeField] private TextMeshProUGUI loanRepaidText;   // shown when a loan was repaid this day
+    
+    [Header("Profit Tracking")]
+    [SerializeField] private TextMeshProUGUI todaysProfitText;
+    [SerializeField] private TextMeshProUGUI targetProfitText;
 
     [Header("Buttons")]
     [SerializeField] private Button nextDayButton;
@@ -45,7 +49,7 @@ public class AuctionResultsPanel : MonoBehaviour
     //  PUBLIC API  (called by DayManager)
     // ─────────────────────────────────────────────────
 
-    public void Show(List<PurchasedItem> items, float totalEarnings, bool loanWasRepaid = false)
+    public void Show(List<PurchasedItem> items, float totalEarnings, float profitEarned, float profitTarget, bool loanWasRepaid = false)
     {
         gameObject.SetActive(true); // Ensure the panel's GameObject is active first!
 
@@ -65,6 +69,11 @@ public class AuctionResultsPanel : MonoBehaviour
         {
             if (emptyMessageText != null) emptyMessageText.gameObject.SetActive(false);
 
+            // 1. Instantiate the Header Row first
+            GameObject headerRow = Instantiate(rowPrefab, rowContainer);
+            headerRow.GetComponent<AuctionResultRow>()?.SetupHeader("Item Name", "Status", "Bought", "Sold");
+
+            // 2. Instantiate each purchased item row
             foreach (var item in items)
             {
                 GameObject row = Instantiate(rowPrefab, rowContainer);
@@ -74,6 +83,15 @@ public class AuctionResultsPanel : MonoBehaviour
 
         if (totalEarningsText != null)
             totalEarningsText.text = $"Total Earned: ${totalEarnings:F0}";
+
+        if (todaysProfitText != null)
+        {
+            string colorHex = profitEarned >= profitTarget ? "#00FF00" : "#FF0000"; // Green if hit, Red if missed
+            todaysProfitText.text = $"Today's Profit: <color={colorHex}>${profitEarned:F0}</color>";
+        }
+
+        if (targetProfitText != null)
+            targetProfitText.text = $"Target Profit: ${profitTarget:F0}";
 
         // Show/hide the Loan Repaid banner
         if (loanRepaidText != null)

@@ -15,7 +15,7 @@ MonoBehaviour:
   gunModelName: HK P30L
   serialNumber: BG-450
   madeIn: 0
-  overallLength: 4.5 cm
+  overallLength: 4cm
   yearManufactured: 2004
   gunState: 0
   fakeReason: 0
@@ -26,7 +26,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6302a4c221ad97a4983a71a5e3848b68, type: 3}
   - {fileID: 21300000, guid: bcab18e6aaf1c5247b31d7d8b5be1655, type: 3}
   - {fileID: 21300000, guid: 894667c234c738f44bc0ae768a21632c, type: 3}
-  legitimateLogoIndex: 2
   fakeLogoIndices: 01000000
   minAskPrice: 200
   maxAskPrice: 250

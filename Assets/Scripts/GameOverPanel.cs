@@ -60,7 +60,28 @@ public class GameOverPanel : MonoBehaviour
                 case GameOverReason.LoanNotRepaid:
                     reasonText.text = "You couldn't repay your loan! The bank has seized your shop.";
                     break;
+                case GameOverReason.TooManyFakes:
+                    reasonText.text = "FIRED! You bought too many fake guns and ruined the shop's reputation.";
+                    break;
             }
+        }
+    }
+
+    public void ShowVictory()
+    {
+        gameObject.SetActive(true);
+
+        if (panelRoot != null)
+        {
+            panelRoot.SetActive(true);
+            panelRoot.transform.SetAsLastSibling();
+        }
+
+        if (reasonText != null)
+        {
+            reasonText.gameObject.SetActive(true);
+            reasonText.enabled = true;
+            reasonText.text = "VICTORY! You survived all 3 days and successfully managed the shop!";
         }
     }
 }

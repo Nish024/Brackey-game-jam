@@ -18,6 +18,8 @@ public class CustomerSpawner : MonoBehaviour
     [Header("Customer")]
     [SerializeField] private GameObject customerPrefab;
     [SerializeField] private float moveSpeed = 3f;
+    [Tooltip("Rotation offset applied when spawning/moving. E.g. (-90, 0, 0) to fix sideways models.")]
+    [SerializeField] private Vector3 spawnRotationOffset = new Vector3(-90f, 0f, 0f);
 
     [Header("Item Prices (Temporary — replaced by item system)")]
     [SerializeField] private float minItemPrice = 50f;
@@ -95,7 +97,8 @@ public class CustomerSpawner : MonoBehaviour
     private void SpawnCustomer()
     {
         if (customerPrefab == null) { Debug.LogError("[CustomerSpawner] No prefab!"); return; }
-        currentCustomer = Instantiate(customerPrefab, startingSP.position, startingSP.rotation);
+        Quaternion rot = startingSP.rotation * Quaternion.Euler(spawnRotationOffset);
+        currentCustomer = Instantiate(customerPrefab, startingSP.position, rot);
         activeCustomers.Add(currentCustomer);
         
         StartCoroutine(MoveToCounter(currentCustomer));
@@ -141,7 +144,9 @@ public class CustomerSpawner : MonoBehaviour
         Transform t = obj.transform;
 
         float dist = Vector3.Distance(t.position, targetPos);
-        if (dist < 0.01f) { t.SetPositionAndRotation(targetPos, targetRot); yield break; }
+        Quaternion finalRot = targetRot * Quaternion.Euler(spawnRotationOffset);
+
+        if (dist < 0.01f) { t.SetPositionAndRotation(targetPos, finalRot); yield break; }
 
         float duration = dist / moveSpeed;
         float elapsed  = 0f;
@@ -154,7 +159,7 @@ public class CustomerSpawner : MonoBehaviour
             elapsed += Time.deltaTime;
             float s = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
             t.position = Vector3.Lerp(startPos, targetPos, s);
-            t.rotation = Quaternion.Slerp(startRot, targetRot, s);
+            t.rotation = Quaternion.Slerp(startRot, finalRot, s);
             yield return null;
         }
 

@@ -27,6 +27,10 @@ public class ShutterDoor : MonoBehaviour
     [SerializeField] private float moveDuration = 1.2f;
     [SerializeField] private float dayHoldTime = 1.5f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip doorMoveSfx;
+
     [Header("Events")]
     [Tooltip("Fired when the door starts moving (useful for playing a sound effect).")]
     public UnityEvent onDoorMove;
@@ -36,15 +40,27 @@ public class ShutterDoor : MonoBehaviour
         // Hide Day Text initially
         if (dayText != null) dayText.gameObject.SetActive(false);
 
-        // Ensure door starts closed (down) at game launch
-        if (doorTransform != null && spawnDown != null)
-        {
-            doorTransform.position = spawnDown.position;
-            doorTransform.rotation = spawnDown.rotation;
-        }
+        // Determine if we are starting a fresh game on Day 1
+        bool isFreshGame = GameManager.Instance == null || GameManager.Instance.currentDay == 1;
 
-        // We start with the UI hidden since the door is closed
-        SetUIHidden(true);
+        // Ensure door starts closed (down) UNLESS it's a fresh game where we skip the Day 1 intro
+        if (doorTransform != null && spawnDown != null && spawnUp != null)
+        {
+            if (isFreshGame)
+            {
+                // Leave it open so the camera transition looks clean
+                doorTransform.position = spawnUp.position;
+                doorTransform.rotation = spawnUp.rotation;
+                SetUIHidden(false);
+            }
+            else
+            {
+                // Mid-game loads should start with the door closed
+                doorTransform.position = spawnDown.position;
+                doorTransform.rotation = spawnDown.rotation;
+                SetUIHidden(true);
+            }
+        }
     }
 
     private void OnEnable()

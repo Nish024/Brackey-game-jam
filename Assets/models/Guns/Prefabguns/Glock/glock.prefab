@@ -157,7 +157,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 23792737999539733, guid: d39bd280471feac4fbeeffd06c7d4e03, type: 3}
       propertyPath: m_RenderingLayerMask
-      value: 3
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d39bd280471feac4fbeeffd06c7d4e03, type: 3}
       propertyPath: m_Name
@@ -169,11 +169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4455910273544654780, guid: d39bd280471feac4fbeeffd06c7d4e03, type: 3}
       propertyPath: m_RenderingLayerMask
-      value: 3
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 9116004672427773362, guid: d39bd280471feac4fbeeffd06c7d4e03, type: 3}
       propertyPath: m_RenderingLayerMask
-      value: 3
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

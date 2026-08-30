@@ -75,9 +75,6 @@ public class PhoneController : MonoBehaviour
 
         isAtView = true;
         
-        // Reset to home screen whenever the phone is picked up
-        var appManager = FindObjectOfType<PhoneAppManager>();
-        if (appManager != null) appManager.GoToHome();
 
         if (phoneUI != null) phoneUI.SetActive(true);
         
@@ -99,6 +96,10 @@ public class PhoneController : MonoBehaviour
             // Drop gun if it's currently being viewed
             var pickup = FindObjectOfType<Pickup>();
             if (pickup != null) pickup.ForceReturnItem();
+
+            // Drop loan machine if it's currently being viewed
+            var loanMachine = FindObjectOfType<LoanMachineController>();
+            if (loanMachine != null && loanMachine.IsAtView) loanMachine.MoveToIdle();
 
             MoveToView();
         }

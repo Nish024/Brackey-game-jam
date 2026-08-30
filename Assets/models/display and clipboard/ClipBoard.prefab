@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 393574794860324621}
   m_LocalRotation: {x: 0.003975078, y: -0.7103593, z: 0.70380336, w: -0.005897568}
-  m_LocalPosition: {x: 0, y: 0, z: 0.545}
+  m_LocalPosition: {x: 0, y: 0, z: 0.56}
   m_LocalScale: {x: 0.03148289, y: 0.03148289, z: 0.03148289}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 89.04, y: -236.492, z: -56.336}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.162}
+  m_AnchoredPosition: {x: 0.037, y: 0.162}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &6136342406076933455
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Year
+  m_text: 'Year : 2007'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -207,7 +207,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2880456779909082156}
   m_LocalRotation: {x: 0.003975078, y: -0.7103593, z: 0.70380336, w: -0.005897568}
-  m_LocalPosition: {x: 0, y: 0, z: 0.258}
+  m_LocalPosition: {x: 0, y: 0, z: 0.225}
   m_LocalScale: {x: 0.03148289, y: 0.03148289, z: 0.03148289}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -215,7 +215,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 89.04, y: -236.492, z: -56.336}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.165}
+  m_AnchoredPosition: {x: 0.045, y: 0.165}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &1600974834871707911
@@ -287,7 +287,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Made in
+  m_text: 'Made in china
 
 '
   m_isRightToLeft: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.1
+  m_fontSize: 25.7
   m_fontSizeBase: 24.16
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -355,7 +355,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 3.9344049, w: 2.4187422}
+  m_margin: {x: 0, y: 0, z: -1.3001642, w: 2.1272733}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -390,15 +390,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4665858837078750537}
   m_LocalRotation: {x: 0.003975078, y: -0.7103593, z: 0.70380336, w: -0.005897568}
-  m_LocalPosition: {x: 0, y: 0, z: 0.408}
-  m_LocalScale: {x: 0.03148289, y: 0.03148289, z: 0.03148289}
+  m_LocalPosition: {x: 0, y: 0, z: 0.366}
+  m_LocalScale: {x: 0.027698332, y: 0.027698332, z: 0.027698332}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2199143187075855376}
   m_LocalEulerAnglesHint: {x: 89.04, y: -236.492, z: -56.336}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.164}
+  m_AnchoredPosition: {x: 0.073, y: 0.164}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8364053016334495313
@@ -470,8 +470,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Barrel Length
-
+  m_text: 'Barrel Length - 4.1 inches
 
 '
   m_isRightToLeft: 0
@@ -539,7 +538,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: -0.69941187, z: -1.186388, w: 0.99851525}
+  m_margin: {x: 0, y: -0.69941187, z: -4.191825, w: 0.5346327}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -574,7 +573,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6927439771923276252}
   m_LocalRotation: {x: 0.003975078, y: -0.7103593, z: 0.70380336, w: -0.005897568}
-  m_LocalPosition: {x: 0, y: 0, z: 0.118}
+  m_LocalPosition: {x: 0, y: 0, z: 0.079}
   m_LocalScale: {x: 0.03148289, y: 0.03148289, z: 0.03148289}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -582,7 +581,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 89.04, y: -236.492, z: -56.336}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.167}
+  m_AnchoredPosition: {x: 0.037, y: 0.167}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &4263493637956507367
@@ -654,7 +653,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Serial Number
+  m_text: 'serial : spt - 12345'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -720,7 +719,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 3.9344049, w: 2.4187422}
+  m_margin: {x: 0, y: 0, z: -0.04958343, w: 2.4187422}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -755,7 +754,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8788868101721366372}
   m_LocalRotation: {x: 0.003975078, y: -0.7103593, z: 0.70380336, w: -0.005897568}
-  m_LocalPosition: {x: 0, y: 0, z: -0.132}
+  m_LocalPosition: {x: 0, y: 0, z: -0.178}
   m_LocalScale: {x: 0.03148289, y: 0.03148289, z: 0.03148289}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -763,7 +762,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 89.04, y: -236.492, z: -56.336}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.043, y: 0.167}
+  m_AnchoredPosition: {x: 0.001, y: 0.167}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &2193105578387927921
@@ -835,9 +834,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Name
-
-'
+  m_text: 'Model : Revolver'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -871,8 +868,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -903,7 +900,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -0.70250034, y: 0, z: 1.7643037, w: -0.42624068}
+  m_margin: {x: -0.8593941, y: 0.8870685, z: 1.7140985, w: -1.0339074}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -1005,6 +1002,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ee84e60c2c8ea44a9e82dc2114b52f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6002387082790140993}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ee84e60c2c8ea44a9e82dc2114b52f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4357754212923581424}
   m_SourcePrefab: {fileID: 100100000, guid: 7ee84e60c2c8ea44a9e82dc2114b52f7, type: 3}
 --- !u!1 &1571542686082543274 stripped
 GameObject:
@@ -1049,7 +1049,20 @@ MonoBehaviour:
   madeInText: {fileID: 5239793570721426897}
   barrelLengthText: {fileID: 714775656970823185}
   yearText: {fileID: 7995225328101682099}
-  manufacturerText: {fileID: 0}
+--- !u!114 &-4357754212923581424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1571542686082543274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1818f78bf1027141a5bf9b8033f88bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialHoverItem
+  descriptionText: 'Clipboard: Contains the customer''s claims about the item. Cross-reference
+    this with your rulebook to catch fake items ,Trust No One'
 --- !u!4 &2199143187075855376 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7ee84e60c2c8ea44a9e82dc2114b52f7, type: 3}

@@ -67,6 +67,9 @@ public static class GameEvents
     /// <summary>Fired when the game is over, with the reason.</summary>
     public static Action<GameOverReason> OnGameOver;
 
+    /// <summary>Fired when the player successfully survives all days.</summary>
+    public static Action OnGameWon;
+
     /// <summary>Clears all listeners. Call on scene transitions to prevent stale references.</summary>
     public static void ClearAll()
     {
@@ -86,6 +89,7 @@ public static class GameEvents
         OnShopClosed = null;
         OnAuctionComplete = null;
         OnGameOver = null;
+        OnGameWon = null;
         OnLoanOffered = null;
         OnLoanConfirmed = null;
     }
@@ -96,5 +100,6 @@ public enum GameOverReason
     Arrest,
     Bankruptcy,
     MissedQuota,
-    LoanNotRepaid
+    LoanNotRepaid,
+    TooManyFakes
 }

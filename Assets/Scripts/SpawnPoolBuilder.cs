@@ -17,9 +17,28 @@ public static class SpawnPoolBuilder
         List<GameObject> rawPool = new List<GameObject>();
         if (availableModels == null || availableModels.Length == 0) return new Queue<GameObject>();
 
-        // 1. Pick today's featured models (e.g. max 2 per day)
+        // Filter out any models that have already been bought in previous days/transactions!
+        HashSet<string> bought = GameManager.Instance != null 
+            ? GameManager.Instance.boughtModelNames 
+            : new HashSet<string>();
+
+        List<GameObject> tempAvailable = new List<GameObject>();
+        foreach (var model in availableModels)
+        {
+            if (model != null && !bought.Contains(GetModelName(model)))
+            {
+                tempAvailable.Add(model);
+            }
+        }
+
+        if (tempAvailable.Count == 0)
+        {
+            Debug.LogWarning("[SpawnPoolBuilder] All models have been bought! Falling back to allowing all models to prevent crash.");
+            tempAvailable.AddRange(availableModels);
+        }
+
+        // 1. Pick today's featured models
         List<GameObject> featuredModels = new List<GameObject>();
-        List<GameObject> tempAvailable = new List<GameObject>(availableModels);
         
         for (int i = 0; i < maxModelsPerDay && tempAvailable.Count > 0; i++)
         {
@@ -136,33 +155,70 @@ public static class SpawnPoolBuilder
 
     private static void ApplyAntiClustering(List<GameObject> pool, HashSet<GameObject> legitPrefabs)
     {
-        for (int i = 0; i < pool.Count - 1; i++)
+        // Try to keep the same model separated by at least 'spacing' items
+        // We dynamically calculate a reasonable spacing based on how many unique models are in the pool.
+        HashSet<string> uniqueModelsInPool = new HashSet<string>();
+        foreach (var item in pool) uniqueModelsInPool.Add(GetModelName(item));
+        
+        // If we only have 1 or 2 models, spacing can only be 1 or 2 realistically.
+        int desiredSpacing = Mathf.Min(uniqueModelsInPool.Count, 3);
+
+        if (desiredSpacing <= 1) return; // Can't space if everything is the same model
+
+        for (int i = 0; i < pool.Count; i++)
         {
             string currentModel = GetModelName(pool[i]);
-            string nextModel = GetModelName(pool[i + 1]);
 
-            if (currentModel == nextModel)
+            // Check if this model violates the spacing rule with any recent items
+            bool violatesSpacing = false;
+            int lookbackLimit = Mathf.Max(0, i - desiredSpacing + 1);
+            for (int j = lookbackLimit; j < i; j++)
             {
-                bool isNextLegit = legitPrefabs.Contains(pool[i + 1]);
-
-                int swapIndex = -1;
-                for (int j = i + 2; j < pool.Count; j++)
+                if (GetModelName(pool[j]) == currentModel)
                 {
-                    string candidateModel = GetModelName(pool[j]);
-                    bool isCandidateLegit = legitPrefabs.Contains(pool[j]);
+                    violatesSpacing = true;
+                    break;
+                }
+            }
 
-                    // Try to find a different model with the same legitimacy
-                    if (candidateModel != currentModel && isCandidateLegit == isNextLegit)
+            if (violatesSpacing)
+            {
+                // Try to swap it with something further down the list
+                int swapIndex = -1;
+                for (int k = i + 1; k < pool.Count; k++)
+                {
+                    string candidateModel = GetModelName(pool[k]);
+                    
+                    // Don't swap if the candidate is the same model!
+                    if (candidateModel == currentModel) continue;
+
+                    // Don't swap if the candidate would break legitimacy rules (optional, but good for window guarantee)
+                    bool isCurrentLegit = legitPrefabs.Contains(pool[i]);
+                    bool isCandidateLegit = legitPrefabs.Contains(pool[k]);
+                    if (isCurrentLegit != isCandidateLegit) continue;
+
+                    // Ensure the candidate itself hasn't been used recently
+                    bool candidateViolates = false;
+                    for (int j = lookbackLimit; j < i; j++)
                     {
-                        swapIndex = j;
+                        if (GetModelName(pool[j]) == candidateModel)
+                        {
+                            candidateViolates = true;
+                            break;
+                        }
+                    }
+
+                    if (!candidateViolates)
+                    {
+                        swapIndex = k;
                         break;
                     }
                 }
 
                 if (swapIndex != -1)
                 {
-                    GameObject temp = pool[i + 1];
-                    pool[i + 1] = pool[swapIndex];
+                    GameObject temp = pool[i];
+                    pool[i] = pool[swapIndex];
                     pool[swapIndex] = temp;
                 }
             }

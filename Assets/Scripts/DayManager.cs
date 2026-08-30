@@ -43,6 +43,22 @@ public class DayManager : MonoBehaviour
         // Read day number from GameManager; default to 1 for isolated scene testing
         currentDay = GameManager.Instance != null ? GameManager.Instance.currentDay : 1;
 
+        // If it's Day 1, we wait for MainMenuController to call StartDayCycle()
+        // If it's Day 2 or higher, we start automatically!
+        if (currentDay > 1)
+        {
+            StartDayCycle(false);
+        }
+    }
+
+    public void StartDayCycle(bool skipIntro = false)
+    {
+        if (skipIntro)
+        {
+            OpenShop();
+            return;
+        }
+
         // Begin the day intro (door closed → "DAY X" → open door → open shop)
         if (shutterDoor != null)
             shutterDoor.ShowDayIntro(currentDay, OpenShop);
@@ -123,8 +139,12 @@ public class DayManager : MonoBehaviour
 
         Debug.Log($"[DayManager] Showing auction panel with {results.Count} items. Total: ${totalEarned:F0} | Loan repaid: {loanWasRepaid}");
 
+        float currentNetWorth = ledger.NetWorth;
+        float profitEarnedToday = currentNetWorth - netWorthAtDayStart;
+        float profitTarget = GameManager.Instance != null ? GameManager.Instance.todaysProfitTarget : 0f;
+
         // Show auction panel (UI hidden array in ShutterDoor ensures it doesn't overlap behind)
-        auctionResultsPanel.Show(results, totalEarned, loanWasRepaid);
+        auctionResultsPanel.Show(results, totalEarned, profitEarnedToday, profitTarget, loanWasRepaid);
     }
 
     // ─────────────────────────────────────────────────
@@ -140,9 +160,31 @@ public class DayManager : MonoBehaviour
         // Hide the auction panel FIRST so it doesn't overlap with Game Over screens
         auctionResultsPanel.Hide();
 
+        // 1. Check for Fake gun penalties (Strikes)
+        if (GameManager.Instance != null)
+        {
+            int fakesBoughtToday = 0;
+            foreach (var item in purchasedInventory.Items)
+            {
+                if (item.isFake) fakesBoughtToday++;
+            }
+
+            if (fakesBoughtToday > 0)
+            {
+                GameManager.Instance.currentStrikes += fakesBoughtToday;
+                Debug.Log($"[DayManager] Bought {fakesBoughtToday} fakes! Total strikes: {GameManager.Instance.currentStrikes}/{GameManager.Instance.maxStrikes}");
+                
+                if (GameManager.Instance.currentStrikes >= GameManager.Instance.maxStrikes)
+                {
+                    GameEvents.OnGameOver?.Invoke(GameOverReason.TooManyFakes);
+                    return;
+                }
+            }
+        }
+
         float profitEarnedToday = endOfDayCash - netWorthAtDayStart;
 
-        // Check for Game Over conditions
+        // 2. Check for Financial Game Over conditions
         if (endOfDayCash < 0)
         {
             GameEvents.OnGameOver?.Invoke(GameOverReason.Bankruptcy);
@@ -156,11 +198,19 @@ public class DayManager : MonoBehaviour
             return;
         }
 
-        // Advance the day in GameManager
+        // 3. Advance the day in GameManager
         if (GameManager.Instance != null)
+        {
             GameManager.Instance.AdvanceDay(endOfDayCash);
+            
+            // If the game was won during AdvanceDay (currentDay > configs), stop here!
+            if (GameManager.Instance.currentDay > GameManager.Instance.dailyConfigs.Length)
+            {
+                return;
+            }
+        }
 
-        // Reset for the new day
+        // 4. Reset for the new day in this scene
         currentDay++;
         purchasedInventory.Clear();
         roundTimer?.ResetTimer();

@@ -44,7 +44,7 @@ public class AuctionResultRow : MonoBehaviour
 
     public void Setup(PurchasedItem item)
     {
-        if (itemNameText    != null) itemNameText.text    = item.itemName;
+        if (itemNameText    != null) itemNameText.text    = FormatItemName(item.itemName);
         if (statusText      != null) statusText.text      = item.StatusText;
         if (purchasePriceText != null) purchasePriceText.text = $"${item.purchasePrice:F0}";
         if (salePriceText   != null) salePriceText.text   = $"${item.salePrice:F0}";
@@ -56,5 +56,40 @@ public class AuctionResultRow : MonoBehaviour
                              : item.isStolen  ? new Color(0.9f, 0.5f, 0.0f) // orange
                                               : new Color(0.3f, 0.9f, 0.3f); // green for genuine
         }
+    }
+
+    public void SetupHeader(string itemCol = "Item Name", string statusCol = "Status", string boughtCol = "Bought Price", string soldCol = "Sold Price")
+    {
+        if (itemNameText != null)
+        {
+            itemNameText.text = itemCol;
+            itemNameText.fontStyle = FontStyles.Bold;
+            itemNameText.color = new Color(1f, 0.85f, 0.4f); // Golden accent
+        }
+        if (statusText != null)
+        {
+            statusText.text = statusCol;
+            statusText.fontStyle = FontStyles.Bold;
+            statusText.color = new Color(1f, 0.85f, 0.4f);
+        }
+        if (purchasePriceText != null)
+        {
+            purchasePriceText.text = boughtCol;
+            purchasePriceText.fontStyle = FontStyles.Bold;
+            purchasePriceText.color = new Color(1f, 0.85f, 0.4f);
+        }
+        if (salePriceText != null)
+        {
+            salePriceText.text = soldCol;
+            salePriceText.fontStyle = FontStyles.Bold;
+            salePriceText.color = new Color(1f, 0.85f, 0.4f);
+        }
+    }
+
+    private string FormatItemName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        string clean = name.Replace("_real", "").Replace("_fake", "").Replace("_stolen", "").Replace("_", " ");
+        return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(clean);
     }
 }

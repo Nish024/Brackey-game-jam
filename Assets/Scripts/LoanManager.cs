@@ -22,15 +22,6 @@ public class LoanManager : MonoBehaviour
     [SerializeField] private Ledger ledger;
     [SerializeField] private PurchasedInventory purchasedInventory;
 
-    [Header("Loan Panel UI")]
-    [SerializeField] private GameObject loanPanelRoot;
-    [SerializeField] private TextMeshProUGUI loanAmountText;
-    [SerializeField] private TextMeshProUGUI interestRateText;
-    [SerializeField] private Button plusButton;
-    [SerializeField] private Button minusButton;
-    [SerializeField] private Button confirmLoanButton;
-    [SerializeField] private Button closePanelButton;
-    [SerializeField] private Button loanButton; // The trigger button in the main UI
     [SerializeField] private TransactionController transactionController;
 
     [Header("Settings")]
@@ -54,25 +45,15 @@ public class LoanManager : MonoBehaviour
     private float pendingItemPrice;
     private int currentLoanAmount;
 
+    public int CurrentLoanAmount => currentLoanAmount;
+
     // ─────────────────────────────────────────────────
     //  LIFECYCLE
     // ─────────────────────────────────────────────────
 
     void Awake()
     {
-        // Hide panel at start, but keep loan button visible and locked
-        if (loanPanelRoot != null) loanPanelRoot.SetActive(false);
-        if (loanButton != null)
-        {
-            loanButton.gameObject.SetActive(true);
-            loanButton.interactable = false;
-        }
-
-        // Wire buttons
-        if (plusButton   != null) plusButton.onClick.AddListener(OnPlus);
-        if (minusButton  != null) minusButton.onClick.AddListener(OnMinus);
-        if (confirmLoanButton != null) confirmLoanButton.onClick.AddListener(OnConfirmLoan);
-        if (closePanelButton  != null) closePanelButton.onClick.AddListener(HidePanel);
+        // Initialization if needed
     }
 
     void OnEnable()
@@ -110,17 +91,17 @@ public class LoanManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Wire this to the Loan Button's OnClick in the Inspector.
-    /// Hard gate: only opens the panel if player genuinely can't afford the item
+    /// Attempts to open the loan panel. Returns true if allowed, false if blocked.
+    /// Hard gate: only opens if player genuinely can't afford the item
     /// and hasn't already used a loan this round.
     /// </summary>
-    public void OpenLoanPanel()
+    public bool TryOpenLoanPanel()
     {
         // Hard guard 1: loan already used this round
         if (!CanOfferLoan())
         {
             Debug.Log("[LoanManager] Loan already used this round — ignoring.");
-            return;
+            return false;
         }
 
         // Hard guard 2: player can actually afford the item — don't allow loan
@@ -128,12 +109,20 @@ public class LoanManager : MonoBehaviour
             ledger.NetWorth >= transactionController.CurrentItemPrice)
         {
             Debug.Log($"[LoanManager] Player can afford ${transactionController.CurrentItemPrice:F0} — loan blocked.");
-            return;
+            return false;
         }
 
-        float itemPrice = transactionController != null ? transactionController.CurrentItemPrice : 0f;
+        // Hard guard 3: no customer / item price is 0
+        if (transactionController == null || transactionController.CurrentItemPrice <= 0f)
+        {
+            Debug.Log("[LoanManager] No customer present — loan blocked.");
+            return false;
+        }
+
+        float itemPrice = transactionController.CurrentItemPrice;
         float rate = CurrentInterestRate();
         ShowLoanPanel(itemPrice, rate);
+        return true;
     }
 
     // ─────────────────────────────────────────────────
@@ -144,50 +133,25 @@ public class LoanManager : MonoBehaviour
     {
         pendingItemPrice = itemPrice;
         currentLoanAmount = 0; // start at 0, player decides how much to borrow
-
-        gameObject.SetActive(true);
-        if (loanPanelRoot != null)
-        {
-            loanPanelRoot.SetActive(true);
-            loanPanelRoot.transform.SetAsLastSibling();
-        }
-
-        UpdatePanelUI();
-        Debug.Log($"[LoanManager] Loan panel shown. Item: ${itemPrice:F0}, Rate: {interestRate * 100f:F0}%");
+        Debug.Log($"[LoanManager] Loan started. Item: ${itemPrice:F0}, Rate: {interestRate * 100f:F0}%");
     }
 
-    private void HidePanel()
-    {
-        if (loanPanelRoot != null) loanPanelRoot.SetActive(false);
-    }
-
-    private void OnPlus()
+    public void OnPlus()
     {
         currentLoanAmount = Mathf.Min(currentLoanAmount + loanStep, maxLoanAmount);
-        UpdatePanelUI();
     }
 
-    private void OnMinus()
+    public void OnMinus()
     {
         currentLoanAmount = Mathf.Max(currentLoanAmount - loanStep, 0);
-        UpdatePanelUI();
     }
 
-    private void UpdatePanelUI()
-    {
-        float rate = CurrentInterestRate();
-        float repayment = Mathf.Round(currentLoanAmount * (1f + rate));
 
-        if (loanAmountText  != null) loanAmountText.text  = $"{currentLoanAmount}";
-        if (interestRateText != null) interestRateText.text = $"Interest: {rate * 100f:F0}% — Repay: ${repayment:F0}";
-    }
-
-    private void OnConfirmLoan()
+    public void OnConfirmLoan()
     {
         if (currentLoanAmount <= 0)
         {
             Debug.Log("[LoanManager] Loan amount is 0, nothing to confirm.");
-            HidePanel();
             return;
         }
 
@@ -204,9 +168,6 @@ public class LoanManager : MonoBehaviour
 
         Debug.Log($"[LoanManager] Loan confirmed: ${currentLoanAmount} at {rate * 100f:F0}% (use #{loanUseCount})");
 
-        HidePanel();
-        if (loanButton != null) loanButton.interactable = false; // Lock trigger button since loan was taken
-
         // Tell TransactionController to retry the purchase now that funds are available
         GameEvents.OnLoanConfirmed?.Invoke();
     }
@@ -214,42 +175,26 @@ public class LoanManager : MonoBehaviour
     private void OnShopOpened()
     {
         loanUsedThisRound = false;
-        HidePanel();
-        if (loanButton != null) loanButton.interactable = false; // always start locked
     }
 
     private void OnShopClosed()
     {
-        HidePanel();
-        if (loanButton != null) loanButton.interactable = false;
+        // cleanup if needed
     }
 
     private void OnDecisionMade(bool bought)
     {
-        // Once a decision is made on the item, lock the loan button
-        if (loanButton != null) loanButton.interactable = false;
+        // cleanup if needed
     }
 
     private void OnNetWorthChanged(float newWorth)
     {
-        // Recheck every time cash changes — e.g. player buys a cheaper item, loan button should hide
         CheckAndToggleLoanButton();
     }
 
     private void CheckAndToggleLoanButton()
     {
-        if (loanButton == null) return;
-
-        // Conditions to UNLOCK the button:
-        // 1. Loan not yet used this round
-        // 2. A customer is present (transactionController has a price set)
-        // 3. Player CANNOT afford the item
-        bool loanAvailable = CanOfferLoan();
-        bool hasCustomer   = transactionController != null && transactionController.CurrentItemPrice > 0f;
-        bool cantAfford    = ledger != null && transactionController != null &&
-                             ledger.NetWorth < transactionController.CurrentItemPrice;
-
-        loanButton.interactable = (loanAvailable && hasCustomer && cantAfford);
+        // UI logic removed. 
     }
 
     // ─────────────────────────────────────────────────

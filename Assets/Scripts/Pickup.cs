@@ -123,6 +123,13 @@ public class Pickup : MonoBehaviour
                 phone.MoveToIdle();
             }
 
+            // Drop loan machine if it's currently being viewed
+            var loanMachine = FindObjectOfType<LoanMachineController>();
+            if (loanMachine != null && loanMachine.IsAtView)
+            {
+                loanMachine.MoveToIdle();
+            }
+
             inspectedItem = item;
             item.MoveToView();
             SetInspectionObjectsActive(true);

@@ -29,21 +29,13 @@ public class ItemSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] private TransactionController transactionController;
 
-    [Header("Daily Spawn Pool (Bag System)")]
-    [SerializeField] private int legitCount = 5;
-    [SerializeField] private int fakeCount = 10;
-    [SerializeField] private int stolenCount = 3;
-    [SerializeField] private int windowSize = 3;
-    
-    [Tooltip("How many unique gun models can show up in a single day?")]
-    [SerializeField] private int maxModelsPerDay = 2;
+    [Header("Testing/Debug")]
+    [Tooltip("If assigned, this prefab will always be the very first item spawned each day. Great for testing!")]
+    [SerializeField] private GameObject forceFirstSpawnPrefab;
 
     [Header("Available Gun Models")]
     [Tooltip("Drag ONLY the LEGIT/REAL prefabs here. The spawner will extract their fake/stolen variations automatically.")]
     [SerializeField] private GameObject[] availableModels;
-    [Header("Testing/Debug")]
-    [Tooltip("If assigned, this prefab will always be the very first item spawned each day. Great for testing!")]
-    [SerializeField] private GameObject forceFirstSpawnPrefab;
 
     private ItemController currentItem;
     private int lastSpawnedIndex = -1;
@@ -157,13 +149,17 @@ public class ItemSpawner : MonoBehaviour
 
     private void OnShopOpened()
     {
+        DayConfig config = GameManager.Instance != null 
+            ? GameManager.Instance.GetCurrentDayConfig() 
+            : new DayConfig(); // Fallback if no GameManager
+
         dailyPool = SpawnPoolBuilder.BuildPool(
             availableModels,
-            maxModelsPerDay,
-            legitCount,
-            fakeCount,
-            stolenCount,
-            windowSize
+            config.maxModelsPerDay,
+            config.legitCount,
+            config.fakeCount,
+            config.stolenCount,
+            config.windowSize
         );
 
         // Debug override: Inject the forced prefab at the front of the queue

@@ -19,6 +19,7 @@ public class TransactionController : MonoBehaviour
     public float CurrentItemPrice => currentItemPrice;
 
     private string currentItemName = "Unknown Item";
+    private string currentGunModelName = "";
     private bool decisionPending;
     private bool shopClosed;
 
@@ -88,6 +89,12 @@ public class TransactionController : MonoBehaviour
             };
             purchasedInventory?.AddItem(item);
 
+            if (GameManager.Instance != null && !string.IsNullOrEmpty(currentGunModelName))
+            {
+                GameManager.Instance.boughtModelNames.Add(currentGunModelName);
+                Debug.Log($"[Transaction] Added '{currentGunModelName}' to global bought list.");
+            }
+
             decisionPending = false;
             if (itemStateText != null) itemStateText.text = "";
             GameEvents.OnDecisionMade?.Invoke(true);
@@ -123,6 +130,7 @@ public class TransactionController : MonoBehaviour
     {
         currentIsFake = resolvedState == GunState.Fake;
         currentIsStolen = resolvedState == GunState.Stolen;
+        currentGunModelName = data.gunModelName;
 
         honestBasePrice = currentIsFake ? 0f : data.minAskPrice;
 

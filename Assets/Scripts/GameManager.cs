@@ -19,11 +19,13 @@ public class GameManager : MonoBehaviour
     [Tooltip("Cash the player starts with on Day 1.")]
     [SerializeField] private float startingCash = 1000f;
 
-    [Tooltip("Profit target for Day 1.")]
-    [SerializeField] private float baseProfitTarget = 500f;
+    [Header("Day Configs")]
+    [Tooltip("Define the targets and spawn pool for each of the 3 days.")]
+    public DayConfig[] dailyConfigs = new DayConfig[3];
 
-    [Tooltip("How much the profit target increases each day.")]
-    [SerializeField] private float profitTargetIncrease = 200f;
+    [Header("Penalty System")]
+    [Tooltip("How many fakes can the player buy before getting fired?")]
+    public int maxStrikes = 3;
 
     // ── Session State (persists across scenes) ─────
     [HideInInspector] public int currentDay = 1;
@@ -33,12 +35,21 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float peakNetWorth;
     [HideInInspector] public GameOverReason lastGameOverReason;
     [HideInInspector] public int loanUseCount; // tracks loan interest escalation across days
+    [HideInInspector] public int currentStrikes;
     [HideInInspector] public bool isPaused;
+    
+    // Tracks models bought during the entire run so they never spawn again
+    public System.Collections.Generic.HashSet<string> boughtModelNames = new System.Collections.Generic.HashSet<string>();
 
     // ── Public Accessors ───────────────────────────
     public float StartingCash => startingCash;
-    public float BaseProfitTarget => baseProfitTarget;
-    public float ProfitTargetIncrease => profitTargetIncrease;
+    
+    public DayConfig GetCurrentDayConfig()
+    {
+        if (dailyConfigs == null || dailyConfigs.Length == 0) return new DayConfig();
+        int index = Mathf.Clamp(currentDay - 1, 0, dailyConfigs.Length - 1);
+        return dailyConfigs[index];
+    }
 
     // ─────────────────────────────────────────────────
     //  LIFECYCLE
@@ -56,22 +67,30 @@ public class GameManager : MonoBehaviour
         transform.SetParent(null); // Detach from parent to allow DontDestroyOnLoad without warnings
         DontDestroyOnLoad(gameObject);
 
+        // Enforce 3 day limit even if the Inspector has older data saved
+        if (dailyConfigs != null && dailyConfigs.Length > 3)
+        {
+            System.Array.Resize(ref dailyConfigs, 3);
+        }
+
         // If we are starting directly in the Shop scene (for testing), initialize cash
         if (currentDay == 1 && currentCash == 0f)
         {
             currentCash = startingCash;
-            todaysProfitTarget = baseProfitTarget;
+            todaysProfitTarget = GetCurrentDayConfig().profitTarget;
         }
     }
 
     void OnEnable()
     {
         GameEvents.OnGameOver += HandleGameOver;
+        GameEvents.OnGameWon += HandleGameWon;
     }
 
     void OnDisable()
     {
         GameEvents.OnGameOver -= HandleGameOver;
+        GameEvents.OnGameWon -= HandleGameWon;
     }
 
     // ─────────────────────────────────────────────────
@@ -83,11 +102,13 @@ public class GameManager : MonoBehaviour
     {
         currentDay = 1;
         currentCash = startingCash;
-        todaysProfitTarget = baseProfitTarget;
+        todaysProfitTarget = GetCurrentDayConfig().profitTarget;
         daysSurvived = 0;
         peakNetWorth = startingCash;
         loanUseCount = 0;
+        currentStrikes = 0;
         isPaused = false;
+        boughtModelNames.Clear();
 
         GameEvents.ClearAll();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -97,8 +118,15 @@ public class GameManager : MonoBehaviour
     public void AdvanceDay(float endOfDayCash)
     {
         currentDay++;
+        
+        if (currentDay > dailyConfigs.Length)
+        {
+            GameEvents.OnGameWon?.Invoke();
+            return;
+        }
+
         currentCash = endOfDayCash;
-        todaysProfitTarget = baseProfitTarget + (profitTargetIncrease * (currentDay - 1));
+        todaysProfitTarget = GetCurrentDayConfig().profitTarget;
         daysSurvived = currentDay - 1;
 
         if (endOfDayCash > peakNetWorth)
@@ -124,4 +152,35 @@ public class GameManager : MonoBehaviour
             gameOverPanel.ShowGameOver(reason);
         }
     }
+
+    private void HandleGameWon()
+    {
+        daysSurvived = currentDay;
+        isPaused = true;
+
+        Debug.Log($"[GameManager] GAME WON! | Day: {currentDay} | Peak Net Worth: ${peakNetWorth:F0}");
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.ShowVictory();
+        }
+    }
+}
+
+[System.Serializable]
+public class DayConfig
+{
+    [Header("Goals")]
+    public float profitTarget = 500f;
+
+    [Header("Spawn Pool")]
+    public int legitCount = 5;
+    public int fakeCount = 10;
+    public int stolenCount = 3;
+    
+    [Tooltip("Window size for the 'Guarantee window' to avoid long streaks of fakes.")]
+    public int windowSize = 3;
+    
+    [Tooltip("Max same models allowed to spawn today.")]
+    public int maxModelsPerDay = 2;
 }

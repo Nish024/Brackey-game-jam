@@ -28,7 +28,7 @@ public class ProfitTargetDisplay : MonoBehaviour
         if (targetText != null && GameManager.Instance != null)
         {
             float target = GameManager.Instance.todaysProfitTarget;
-            targetText.text = $"Target: ${target:F0}";
+            targetText.text = $"Target Profit: ${target:F0}";
         }
     }
 }

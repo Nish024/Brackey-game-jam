@@ -65,9 +65,11 @@ public class ClipboardController : MonoBehaviour
             // Drop gun if it's currently being viewed
             var pickup = FindObjectOfType<Pickup>();
             if (pickup != null) pickup.ForceReturnItem();
-            
 
-            
+            // Drop loan machine if it's currently being viewed
+            var loanMachine = FindObjectOfType<LoanMachineController>();
+            if (loanMachine != null && loanMachine.IsAtView) loanMachine.MoveToIdle();
+
             MoveToView();
         }
     }
